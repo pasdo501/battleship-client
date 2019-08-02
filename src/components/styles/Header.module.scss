@@ -1,0 +1,10 @@
+@import "../../variables";
+
+.header {
+    height: 10rem;
+    background-color: black;
+    color: $main;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

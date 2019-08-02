@@ -1,0 +1,22 @@
+.board {
+    max-width: 45%;
+    @media (max-width: 796px) {
+        max-width: 80%;
+        margin: 1.5rem auto;
+    }
+}
+
+.row {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    border: 2px solid hotpink;
+    flex: 0 0 auto;
+}
+
+.column {
+    background-color: green;
+    border: 1px solid black;
+    width: 8%;
+    padding-top: 8%;
+}
