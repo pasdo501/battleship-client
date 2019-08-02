@@ -1,12 +1,3 @@
-.table {
-    @media (min-width: 797px) {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
-    }
-}
-
 .board {
     flex: 1 1 auto;
     max-width: 45%;
