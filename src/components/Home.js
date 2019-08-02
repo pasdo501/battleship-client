@@ -5,17 +5,24 @@ export default function Home() {
   return (
     <React.Fragment>
       <div>Home component</div>
-      <Link to="/game">Nothing passed</Link>
-      <Link
-        to={{
-          pathname: "/game",
-          state: {
-            id: "someId",
-          },
-        }}
-      >
-        Passing something
-      </Link>
+      <div>
+        <Link to="/prep">Prep</Link>
+      </div>
+      <div>
+        <Link to="/game">Nothing passed</Link>
+      </div>
+      <div>
+        <Link
+          to={{
+            pathname: "/game",
+            state: {
+              id: "someId",
+            },
+          }}
+        >
+          Passing something
+        </Link>
+      </div>
     </React.Fragment>
   );
 }

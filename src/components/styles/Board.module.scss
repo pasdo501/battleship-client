@@ -1,45 +1,70 @@
 .board {
-    flex: 1 1 auto;
-    max-width: 45%;
-    @media (max-width: 796px) {
-        max-width: 80%;
-        margin: 1.5rem auto;
-    }
-    border: 1px solid black;
+  flex: 1 1 auto;
+  max-width: 45%;
+  @media (max-width: 796px) {
+    max-width: 80%;
+    margin: 1.5rem auto;
+  }
+  border: 1px solid black;
 }
 
-.row, .infoRow {
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-    flex: 0 0 auto;
+.row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  flex: 0 0 auto;
 }
 
 .column {
-    background-color: green;
-    border: 1px solid black;
-    width: 10%;
-    padding-top: 10%;
+  position: relative;
+  background-color: white;
+  border: 1px solid black;
+  width: 10%;
+  padding-top: 10%;
+}
+
+.interactiveColumn {
+  @extend .column;
+  cursor: pointer;
+  &:hover {
+    background-color: whitesmoke;
+  }
+}
+
+.placementOverlay {
+    background-color: black;
+    &:hover {
+        background-color: black;
+    }
 }
 
 .infoColumn {
-    display: flex;
-    justify-items: center;
-    align-items: center;
-    padding-right: .8rem;
-    max-width: .4rem;
-    border: .1rem solid black;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  padding-right: 0.8rem;
+  max-width: 0.4rem;
+  border: 0.1rem solid black;
 }
 
-.topCell {
-    &:first-child {
-        max-width: .5rem;
-        padding-right: .8rem;
-        background-color: white;
-        color: white;
-        border: none;
-    }
-    width: 10%;
-    text-align: center;
-    border: 1px solid black;
+/** Style that will be useful for when cells are marked as
+    hit or miss
+    Note: Column will need pos: relative for this to work
+*/
+.targetedColumn {
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  font-size: 2rem;
+  font-weight: lighter;
+  top: calc(50% - 1rem);
+  left: calc(50% - 1rem);
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.miss {
+  @extend .targetedColumn;
+  color: red;
 }

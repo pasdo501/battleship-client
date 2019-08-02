@@ -11,8 +11,8 @@ export default function Game({ location }) {
 
   return (
     <div className={styles.table}>
-      <Board board={board} yours={true} />
-      <Board board={board} yours={false} />
+      <Board board={board} interactive={false} />
+      <Board board={board} interactive={true} />
     </div>
   );
 }
