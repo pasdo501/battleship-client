@@ -1,46 +1,45 @@
 import React from "react";
 
+import {
+  CARRIER,
+  BATTLESHIP,
+  CRUISER,
+  SUBMARINE,
+  DESTROYER,
+} from "../util/variables";
 
+const initialPlacementObjects = [
+  CARRIER,
+  BATTLESHIP,
+  CRUISER,
+  SUBMARINE,
+  DESTROYER,
+];
+
+const initialTotal = initialPlacementObjects.reduce((total, ship) => {
+  return total + ship.quantity;
+}, 0)
 
 export default function usePlacement() {
-  const [size, setSize] = React.useState(1);
-  const [origin, setOrigin] = React.useState([0, 0]);
-  const [orientation, setOrientation] = React.useState("vertical");
-  const [placeable, setPlaceable] = React.useState(false);
+  const [placementObjects, setPlacementObjects] = React.useState(
+    initialPlacementObjects
+  );
+  const [totalLeft, setTotalLeft] = React.useState(initialTotal)
 
-  const onMouseEnter = (row, column) => {
-    setOrigin([row, column]);
-    setPlaceable(
-      orientation === "vertical" ? row + size <= 10 : column + size <= 10
+  const decrementType = (type) => {
+    setPlacementObjects((objects) =>
+      objects.map((o) => {
+        if (o.type === type) {
+          return {
+            ...o,
+            quantity: o.quantity - 1,
+          };
+        }
+        return o;
+      })
     );
+    setTotalLeft(total => total - 1)
   };
 
-  const toggleOrientation = () =>
-    setOrientation((orientation) =>
-      orientation === "vertical" ? "horizontal" : "vertical"
-    );
-
-  const inRange = (row, column) => {
-    if (orientation === "vertical") {
-      if (column !== origin[1]) {
-        return false;
-      }
-      return row >= origin[0] && Math.abs(row - origin[0]) < size;
-    } else {
-      if (row !== origin[0]) {
-        return false;
-      }
-      return column >= origin[1] && Math.abs(column - origin[1]) < size;
-    }
-  };
-
-  return {
-    size,
-    setSize,
-    origin,
-    orientation,
-    onMouseEnter,
-    toggleOrientation,
-    inRange,
-  };
+  return [placementObjects, decrementType, totalLeft];
 }

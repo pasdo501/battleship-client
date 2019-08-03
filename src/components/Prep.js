@@ -2,9 +2,10 @@ import React from "react";
 
 import InfoRow from "./InfoRow";
 
-import styles from "./styles/Board.module.scss";
+import styles from "./styles/Prep.module.scss";
 
-import { FREE_CELL, PLACED_CELL } from "../util/variables";
+import { FREE_CELL } from "../util/variables";
+import usePlacement from "../hooks/usePlacement";
 
 function getHoverCoordinates(origin) {
   const [row, column, orientation, size] = origin;
@@ -33,6 +34,12 @@ function prepReducer(state, action) {
 
       const newBoard = [...state.board];
       const hoverCoordinates = getHoverCoordinates(action.origin);
+      if (hoverCoordinates.length === 0) {
+        return {
+          ...state
+        }
+      }
+
       for (let [row, column] of hoverCoordinates) {
         if (row > 9 || column > 9) {
           placeable = false;
@@ -66,25 +73,43 @@ function prepReducer(state, action) {
       };
     }
     case "place": {
-      if (!state.placeable) {
+      if (!state.placeable || state.shipType === null) {
         return state;
       }
+      
       const newBoard = [...state.board];
       const [, , orientation, size] = action.origin;
       const origin = [action.row, action.column, orientation, size];
       for (let [row, column] of getHoverCoordinates(origin)) {
         newBoard[row][column] = {
           ...newBoard[row][column],
-          type: PLACED_CELL,
-          color: "black",
+          type: state.shipType.type,
+          color: state.shipType.color,
         };
       }
+
+      const newQuantity = state.shipType.quantity - 1;
+      action.decrement();
+      action.reset();
 
       return {
         ...state,
         board: newBoard,
+        placeable: false,
+        shipType:
+          newQuantity === 0
+            ? null
+            : {
+                ...state.shipType,
+                quantity: state.shipType.quantity - 1,
+              },
       };
     }
+    case "shipType":
+      return {
+        ...state,
+        shipType: action.shipType,
+      };
     default:
       throw new Error("Invalid action type used");
   }
@@ -104,23 +129,28 @@ function constructEmptyBoard() {
 }
 
 export default function Prep() {
+  const [placementObjects, decrementType, shipsLeft] = usePlacement();
   const [state, dispatch] = React.useReducer(prepReducer, {
     board: React.useMemo(() => constructEmptyBoard(), []),
     hoverCoordinates: [],
     placeable: true,
+    shipType: null,
   });
 
   // [row, column, orientation, size]
-  const [origin, setOrigin] = React.useState([-1, -1, "v", 2]);
+  const [origin, setOrigin] = React.useState([-1, -1, "v", 0]);
 
   const onMouseEnter = (row, column) => {
+    if (state.shipType === null) {
+      return;
+    }
     setOrigin((origin) => {
       const [, , orientation, size] = origin;
       return [row, column, orientation, size];
     });
   };
 
-  const handleLeaveBoard = () => {
+  const resetOriginCoords = () => {
     setOrigin((origin) => {
       const [, , orientation, size] = origin;
       return [-1, -1, orientation, size];
@@ -142,42 +172,100 @@ export default function Prep() {
     return () => dispatch({ type: "hoverEnd", origin });
   }, [origin]);
 
-  const handleClick = (row, column) =>
-    dispatch({ type: "place", row, column, origin });
+  const handlePlacement = (row, column) => {
+    if (state.shipType === null) return;
+
+    const { type, quantity } = state.shipType;
+    if (quantity <= 0) {
+      return;
+    }
+    const decrement = () => decrementType(type);
+    const reset = () => resetOriginCoords();
+    dispatch({ type: "place", row, column, origin, decrement, reset });
+  };
+
+  const handleTypeChange = (type) => {
+    dispatch({ type: "shipType", shipType: type });
+    setOrigin((origin) => {
+      const [row, column, orientation] = origin;
+      return [row, column, orientation, type.size];
+    });
+  };
+
+  React.useEffect(() => {
+    const listener = (e) => {
+      // T
+      if (e.keyCode === 84) {
+        toggleOrientation();
+      }
+    };
+    document.addEventListener("keydown", listener);
+
+    return () => document.removeEventListener("keydown", listener);
+  });
 
   const { board, placeable } = state;
 
   return (
-    <div>
-      <div style={{ textAlign: `center` }}>Prep Component</div>
-      <button onClick={toggleOrientation}>TOGGLE</button>
-      <div className={styles.board} onMouseLeave={handleLeaveBoard}>
-        <InfoRow />
-        {board.map((row, index) => (
-          <div key={`row-${index}`} className={styles.row}>
-            <div className={styles.infoColumn}>{index + 1}</div>
-            {row.map((column, cIndex) => {
-              return (
-                <div
-                  style={{
-                    backgroundColor: `${
-                      column.hover
-                        ? placeable
-                          ? "green"
-                          : "red"
-                        : column.color
-                    }`,
-                  }}
-                  key={`column-${index}-${cIndex}`}
-                  className={styles.interactiveColumn}
-                  onMouseEnter={() => onMouseEnter(index, cIndex)}
-                  onClick={() => handleClick(index, cIndex)}
-                />
-              );
-            })}
-          </div>
-        ))}
+    <React.Fragment>
+      <h2 style={{ textAlign: `center` }}>Prepare your Ships!</h2>
+
+      <div className={styles.wrapper}>
+        <div className={styles.board} onMouseLeave={resetOriginCoords}>
+          <InfoRow />
+          {board.map((row, index) => (
+            <div key={`row-${index}`} className={styles.row}>
+              <div className={styles.infoColumn}>{index + 1}</div>
+              {row.map((column, cIndex) => {
+                return (
+                  <div
+                    style={{
+                      backgroundColor: `${
+                        column.hover
+                          ? placeable
+                            ? "green"
+                            : "red"
+                          : column.color
+                      }`,
+                    }}
+                    key={`column-${index}-${cIndex}`}
+                    className={styles.interactiveColumn}
+                    onMouseEnter={() => onMouseEnter(index, cIndex)}
+                    onClick={() => handlePlacement(index, cIndex)}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div className={styles.options}>
+          <h3>
+            Currently placing{" "}
+            {state.shipType === null ? "nothing" : state.shipType.name}
+          </h3>
+
+          <table className={styles.table}>
+            <tbody>
+              {placementObjects.map((type, index) => (
+                <tr key={type.name} onClick={() => handleTypeChange(type)}>
+                  <td>
+                    {type.name} x {type.quantity}
+                  </td>
+                  <td className={styles.typeVisualisation}>
+                    {Array(type.size)
+                      .fill(0)
+                      .map((_, index) => (
+                        <div key={index} style={{ backgroundColor: type.color }} />
+                      ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button onClick={toggleOrientation}>Toggle Rotation (T)</button>
+          {shipsLeft > 0 || <button>Done</button>}
+        </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 }
