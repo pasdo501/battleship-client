@@ -36,8 +36,8 @@ function prepReducer(state, action) {
       const hoverCoordinates = getHoverCoordinates(action.origin);
       if (hoverCoordinates.length === 0) {
         return {
-          ...state
-        }
+          ...state,
+        };
       }
 
       for (let [row, column] of hoverCoordinates) {
@@ -76,16 +76,23 @@ function prepReducer(state, action) {
       if (!state.placeable || state.shipType === null) {
         return state;
       }
-      
+
       const newBoard = [...state.board];
       const [, , orientation, size] = action.origin;
       const origin = [action.row, action.column, orientation, size];
+      let head = null;
       for (let [row, column] of getHoverCoordinates(origin)) {
         newBoard[row][column] = {
           ...newBoard[row][column],
           type: state.shipType.type,
           color: state.shipType.color,
+          head: head === null
+            ? [row, column]
+            : head
         };
+        if (head === null) {
+          head = [row, column]
+        }
       }
 
       const newQuantity = state.shipType.quantity - 1;
@@ -185,6 +192,7 @@ export default function Prep() {
   };
 
   const handleTypeChange = (type) => {
+    if (type.quantity < 1) return;
     dispatch({ type: "shipType", shipType: type });
     setOrigin((origin) => {
       const [row, column, orientation] = origin;
@@ -239,23 +247,27 @@ export default function Prep() {
           ))}
         </div>
         <div className={styles.options}>
-          <h3>
-            Currently placing{" "}
-            {state.shipType === null ? "nothing" : state.shipType.name}
-          </h3>
-
           <table className={styles.table}>
             <tbody>
               {placementObjects.map((type, index) => (
                 <tr key={type.name} onClick={() => handleTypeChange(type)}>
-                  <td>
+                  <td
+                    style={
+                      state.shipType === type && state.shipType.quantity > 0
+                        ? { fontWeight: `bold` }
+                        : {}
+                    }
+                  >
                     {type.name} x {type.quantity}
                   </td>
                   <td className={styles.typeVisualisation}>
                     {Array(type.size)
                       .fill(0)
                       .map((_, index) => (
-                        <div key={index} style={{ backgroundColor: type.color }} />
+                        <div
+                          key={index}
+                          style={{ backgroundColor: type.color }}
+                        />
                       ))}
                   </td>
                 </tr>
