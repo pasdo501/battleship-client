@@ -7,8 +7,7 @@ import styles from "./styles/Prep.module.scss";
 import { FREE_CELL } from "../util/variables";
 import usePlacement from "../hooks/usePlacement";
 
-function getHoverCoordinates(origin) {
-  const [row, column, orientation, size] = origin;
+function getHoverCoordinates({ row, column, orientation, size }) {
   if (row === -1 || column === -1) {
     return [];
   }
@@ -78,15 +77,18 @@ function prepReducer(state, action) {
       }
 
       const newBoard = [...state.board];
-      const [, , orientation, size] = action.origin;
-      const origin = [action.row, action.column, orientation, size];
+      const origin = {
+        ...action.origin,
+        row: action.row,
+        column: action.column,
+      };
       let head = null;
       for (let [row, column] of getHoverCoordinates(origin)) {
         newBoard[row][column] = {
           ...newBoard[row][column],
           type: state.shipType,
           head: head === null ? [row, column] : head,
-          orientation,
+          orientation: origin.orientation,
         };
         if (head === null) {
           head = [row, column];
@@ -116,11 +118,13 @@ function prepReducer(state, action) {
         shipType: action.shipType,
       };
     case "pickup":
-      const coords = getHoverCoordinates([
-        ...action.head,
-        action.orientation,
-        action.shipType.size,
-      ]);
+      const [row, column] = action.head;
+      const coords = getHoverCoordinates({
+        row,
+        column,
+        orientation: action.orientation,
+        size: action.shipType.size,
+      });
       const newBoard = [...state.board];
 
       for (let [row, column] of coords) {
@@ -130,6 +134,7 @@ function prepReducer(state, action) {
           color: "white",
         };
       }
+      action.increment();
 
       return {
         ...state,
@@ -169,33 +174,28 @@ export default function Prep() {
   });
 
   // [row, column, orientation, size]
-  const [origin, setOrigin] = React.useState([-1, -1, "v", 0]);
+  const [origin, setOrigin] = React.useState({
+    row: -1,
+    column: -1,
+    orientation: "v",
+    size: 0,
+  });
 
   const onMouseEnter = (row, column) => {
     if (state.shipType === null) {
       return;
     }
-    setOrigin((origin) => {
-      const [, , orientation, size] = origin;
-      return [row, column, orientation, size];
-    });
+    setOrigin((origin) => ({ ...origin, row, column }));
   };
 
-  const resetOriginCoords = () => {
-    setOrigin((origin) => {
-      const [, , orientation, size] = origin;
-      return [-1, -1, orientation, size];
-    });
-  };
+  const resetOriginCoords = () =>
+    setOrigin((origin) => ({ ...origin, row: -1, column: -1 }));
 
-  const toggleOrientation = () => {
-    setOrigin((origin) => {
-      const originCopy = [...origin];
-      originCopy[2] === "v" ? (originCopy[2] = "h") : (originCopy[2] = "v");
-
-      return originCopy;
-    });
-  };
+  const toggleOrientation = () =>
+    setOrigin((origin) => ({
+      ...origin,
+      orientation: origin.orientation === "h" ? "v" : "h",
+    }));
 
   React.useEffect(() => {
     dispatch({ type: "hover", origin });
@@ -218,18 +218,12 @@ export default function Prep() {
   const handleTypeChange = (type) => {
     if (type.quantity < 1) return;
     dispatch({ type: "shipType", shipType: type });
-    setOrigin((origin) => {
-      const [row, column, orientation] = origin;
-      return [row, column, orientation, type.size];
-    });
+    setOrigin((origin) => ({ ...origin, size: type.size }));
   };
 
   const pickupShip = ({ type, head, orientation }) => {
-    // Need to go to the board and delete these coords based
-    // on ship (head & size)
-    // Then increase quantity & set placement type to that ship
-    dispatch({ type: "pickup", shipType: type, head, orientation });
-    incrementType(type.type);
+    const increment = () => incrementType(type.type);
+    dispatch({ type: "pickup", shipType: type, head, orientation, increment });
   };
 
   React.useEffect(() => {
@@ -297,6 +291,7 @@ export default function Prep() {
                     {type.name} x {type.quantity}
                   </td>
                   <td className={styles.typeVisualisation}>
+                    {/* TODO: Make this less gross */}
                     {Array(type.size)
                       .fill(0)
                       .map((_, index) => (
