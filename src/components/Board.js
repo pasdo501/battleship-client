@@ -5,8 +5,7 @@ import InfoRow from "./InfoRow";
 
 import styles from "./styles/Board.module.scss";
 
-export default function Board({ board, interactive, attrs = {} }) {
-  
+export default function Board({ board, interactive }) {
   return (
     <div className={styles.board}>
       <InfoRow />
@@ -14,15 +13,14 @@ export default function Board({ board, interactive, attrs = {} }) {
         <div key={`row-${index}`} className={styles.row}>
           <div className={styles.infoColumn}>{index + 1}</div>
           {row.map((column, cIndex) => {
-            const test = attrs.inRange ? attrs.inRange(index, cIndex) : false;
             return (
               <div
                 key={`column-${index}-${cIndex}`}
-                className={`${
+                className={
                   interactive ? styles.interactiveColumn : styles.column
-                } ${test ? styles.placementOverlay : ''}`}
-                onMouseEnter={attrs.onMouseEnter ? () => attrs.onMouseEnter(index, cIndex) : {}}
+                }
               >
+                {/* Temp, display coords */}
                 <span
                   className={styles.targetedColumn}
                 >{`${index}, ${cIndex}`}</span>
