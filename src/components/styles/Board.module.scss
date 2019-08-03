@@ -64,7 +64,11 @@
   text-align: center;
 }
 
+.hit {
+  @extend .targetedColumn;
+  color: black;
+}
 .miss {
   @extend .targetedColumn;
-  color: red;
+  color: crimson;
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import InfoRow from "./InfoRow";
 
@@ -306,7 +307,18 @@ export default function Prep() {
             </tbody>
           </table>
           <button onClick={toggleOrientation}>Toggle Rotation (T)</button>
-          {shipsLeft > 0 || <button>Done</button>}
+          {shipsLeft > 0 || (
+            <Link
+              to={{
+                pathname: "/game",
+                state: {
+                  board,
+                },
+              }}
+            >
+              Done
+            </Link>
+          )}
         </div>
       </div>
     </React.Fragment>
