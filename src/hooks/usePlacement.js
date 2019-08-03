@@ -41,5 +41,20 @@ export default function usePlacement() {
     setTotalLeft(total => total - 1)
   };
 
-  return [placementObjects, decrementType, totalLeft];
+  const incrementType = (type) => {
+    setPlacementObjects((objects) =>
+      objects.map((o) => {
+        if (o.type === type) {
+          return {
+            ...o,
+            quantity: o.quantity + 1,
+          };
+        }
+        return o;
+      })
+    );
+    setTotalLeft(total => total + 1)
+  };
+
+  return [placementObjects, decrementType, incrementType, totalLeft];
 }

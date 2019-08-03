@@ -84,14 +84,12 @@ function prepReducer(state, action) {
       for (let [row, column] of getHoverCoordinates(origin)) {
         newBoard[row][column] = {
           ...newBoard[row][column],
-          type: state.shipType.type,
-          color: state.shipType.color,
-          head: head === null
-            ? [row, column]
-            : head
+          type: state.shipType,
+          head: head === null ? [row, column] : head,
+          orientation,
         };
         if (head === null) {
-          head = [row, column]
+          head = [row, column];
         }
       }
 
@@ -117,6 +115,27 @@ function prepReducer(state, action) {
         ...state,
         shipType: action.shipType,
       };
+    case "pickup":
+      const coords = getHoverCoordinates([
+        ...action.head,
+        action.orientation,
+        action.shipType.size,
+      ]);
+      const newBoard = [...state.board];
+
+      for (let [row, column] of coords) {
+        newBoard[row][column] = {
+          type: FREE_CELL,
+          hover: false,
+          color: "white",
+        };
+      }
+
+      return {
+        ...state,
+        board: newBoard,
+        shipType: action.shipType,
+      };
     default:
       throw new Error("Invalid action type used");
   }
@@ -136,7 +155,12 @@ function constructEmptyBoard() {
 }
 
 export default function Prep() {
-  const [placementObjects, decrementType, shipsLeft] = usePlacement();
+  const [
+    placementObjects,
+    decrementType,
+    incrementType,
+    shipsLeft,
+  ] = usePlacement();
   const [state, dispatch] = React.useReducer(prepReducer, {
     board: React.useMemo(() => constructEmptyBoard(), []),
     hoverCoordinates: [],
@@ -200,6 +224,14 @@ export default function Prep() {
     });
   };
 
+  const pickupShip = ({ type, head, orientation }) => {
+    // Need to go to the board and delete these coords based
+    // on ship (head & size)
+    // Then increase quantity & set placement type to that ship
+    dispatch({ type: "pickup", shipType: type, head, orientation });
+    incrementType(type.type);
+  };
+
   React.useEffect(() => {
     const listener = (e) => {
       // T
@@ -225,21 +257,23 @@ export default function Prep() {
             <div key={`row-${index}`} className={styles.row}>
               <div className={styles.infoColumn}>{index + 1}</div>
               {row.map((column, cIndex) => {
+                let color;
+                if (column.hover) {
+                  color = placeable ? "green" : "red";
+                } else {
+                  color = column.type ? column.type.color : column.color;
+                }
                 return (
                   <div
-                    style={{
-                      backgroundColor: `${
-                        column.hover
-                          ? placeable
-                            ? "green"
-                            : "red"
-                          : column.color
-                      }`,
-                    }}
+                    style={{ backgroundColor: color }}
                     key={`column-${index}-${cIndex}`}
                     className={styles.interactiveColumn}
                     onMouseEnter={() => onMouseEnter(index, cIndex)}
-                    onClick={() => handlePlacement(index, cIndex)}
+                    onClick={
+                      column.type
+                        ? () => pickupShip(column)
+                        : () => handlePlacement(index, cIndex)
+                    }
                   />
                 );
               })}
@@ -253,7 +287,9 @@ export default function Prep() {
                 <tr key={type.name} onClick={() => handleTypeChange(type)}>
                   <td
                     style={
-                      state.shipType === type && state.shipType.quantity > 0
+                      state.shipType &&
+                      state.shipType.type === type.type &&
+                      state.shipType.quantity > 0
                         ? { fontWeight: `bold` }
                         : {}
                     }
