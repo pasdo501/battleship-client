@@ -38,7 +38,11 @@ export default function Board({ board, interactive, shoot = null }) {
                     ? column.type.color
                     : column.color,
                 }}
-                onClick={interactive && !targeted ? () => shoot(index, cIndex) : null}
+                onClick={
+                  interactive && !targeted && shoot
+                    ? () => shoot(index, cIndex)
+                    : null
+                }
               >
                 {targeted && (
                   <span className={hit ? styles.hit : styles.miss}>

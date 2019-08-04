@@ -39,5 +39,5 @@ export default function useSocket() {
     }
   }, [socket]);
 
-  return [socket, connect, disconnect];
+  return [socket, player, connect, disconnect];
 }

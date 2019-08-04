@@ -10,14 +10,22 @@ import { CELL_HIT, CELL_MISS } from "../util/variables";
 
 function gameReducer(state, action) {
   switch (action.type) {
+    case "startGame":
+      return {
+        ...state,
+        turn: state.player === action.player,
+      };
     case "shotResult": {
       const { row, column, hit } = action;
       const newBoard = state.opponentBoard.map((arr) => arr.slice());
 
       newBoard[row][column] = hit ? CELL_HIT : CELL_MISS;
+
       return {
         ...state,
         opponentBoard: newBoard,
+        message: action.message,
+        turn: !state.turn,
       };
     }
     case "receiveShot": {
@@ -31,6 +39,8 @@ function gameReducer(state, action) {
       return {
         ...state,
         playerBoard: newBoard,
+        message: action.message,
+        turn: !state.turn,
       };
     }
     default:
@@ -39,26 +49,34 @@ function gameReducer(state, action) {
 }
 
 export default function Game({ location }) {
-  const { socket } = React.useContext(SocketContext);
+  const { socket, player } = React.useContext(SocketContext);
 
   const [state, dispatch] = React.useReducer(gameReducer, {
     playerBoard: location.state && location.state.board,
     opponentBoard: React.useMemo(() => Array(10).fill(Array(10).fill(0)), []),
+    player,
+    turn: false,
+    message: "",
   });
 
   React.useEffect(() => {
     if (socket === null) return;
 
-    socket.on("shotResult", (row, column, hit) =>
-      dispatch({ type: "shotResult", row, column, hit })
+    socket.on("startGame", (player) => dispatch({ type: "startGame", player }));
+
+    socket.on("shotResult", (row, column, hit, message) =>
+      dispatch({ type: "shotResult", row, column, hit, message })
     );
-    socket.on("receiveShot", (row, column) =>
-      dispatch({ type: "receiveShot", row, column })
+    socket.on("receiveShot", (row, column, message) =>
+      dispatch({ type: "receiveShot", row, column, message })
     );
+
+    socket.emit("gameReady");
 
     return () => {
       socket.off("hitResult");
       socket.off("receiveShot");
+      socket.off("startGame");
     };
   }, [socket]);
 
@@ -66,9 +84,12 @@ export default function Game({ location }) {
     return <Redirect to="/" />;
   }
 
-  const shoot = (row, column) => socket.emit("shoot", { row, column });
+  const shoot =
+    state.turn === true
+      ? (row, column) => socket.emit("shoot", { row, column })
+      : null;
 
-  const { playerBoard, opponentBoard } = state;
+  const { playerBoard, opponentBoard, turn, message } = state;
 
   if (playerBoard === undefined) {
     // Get Board state from the Server?
@@ -78,7 +99,14 @@ export default function Game({ location }) {
 
   return (
     <div className={styles.table}>
-      <h2 className={styles.info}>Test</h2>
+      <h2 className={styles.info}>
+        {turn ? (
+          <span>It's your turn</span>
+        ) : (
+          <span>It's the other player's turn</span>
+        )}
+        {message && <span style={{ display: `block` }}>{message}</span>}
+      </h2>
       <Board board={playerBoard} interactive={false} />
       <Board board={opponentBoard} interactive={true} shoot={shoot} />
     </div>
