@@ -9,7 +9,6 @@ export default function Modal({
   withCloseButton = true,
   speed = 500,
 }) {
-  console.log(speed)
   const [fadeIn, setFadeIn] = React.useState(false);
   const [hide, setHide] = React.useState(false);
 

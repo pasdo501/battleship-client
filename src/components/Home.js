@@ -1,28 +1,30 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
+import PropTypes from "prop-types";
 
 import Loading from "./Loading";
 import Modal from "./Modal";
 
+import FlashState from "../util/FlashState";
 import SocketContext from "../contexts/socket";
 import styles from "./styles/Home.module.scss";
 
-export default function Home() {
+export default function Home({ location }) {
   const { socket, connect, disconnect } = React.useContext(SocketContext);
   const [showModal, setShowModal] = React.useState(false);
   const [waiting, setWaiting] = React.useState(false);
   const [redirect, setRedirect] = React.useState(false);
-  const [name, setName] = React.useState('')
+  const [name, setName] = React.useState("");
   const inputRef = React.useRef();
 
   const requestGame = () => {
     const playerName = inputRef.current.value.trim();
     if (playerName.length < 1) {
       window.alert("Please enter a name");
-      return
+      return;
     }
-    setShowModal(false)
-    setName(playerName)
+    setShowModal(false);
+    setName(playerName);
     setWaiting(true);
     connect();
   };
@@ -37,14 +39,20 @@ export default function Home() {
       return;
     }
 
-    console.log(name)
-    console.log(socket)
     socket.emit("name", name);
 
     socket.on("playersReady", () => setRedirect(true));
 
     return () => socket.off("playersReady");
   }, [socket, name]);
+
+  React.useEffect(() => {
+    const message = FlashState.get("redirectMessage");
+
+    if (message) {
+      window.alert(message);
+    }
+  }, []);
 
   if (redirect) {
     return <Redirect to="/prep" />;
@@ -79,3 +87,7 @@ export default function Home() {
     </React.Fragment>
   );
 }
+
+Home.propTypes = {
+  location: PropTypes.object.isRequired,
+};

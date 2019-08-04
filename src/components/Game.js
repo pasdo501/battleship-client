@@ -3,6 +3,7 @@ import { Redirect } from "react-router-dom";
 import styles from "./styles/Game.module.scss";
 
 import Board from "./Board";
+import Modal from "./Modal";
 
 import SocketContext from "../contexts/socket";
 
@@ -16,7 +17,7 @@ function gameReducer(state, action) {
         turn: state.player === action.player,
       };
     case "shotResult": {
-      const { row, column, hit } = action;
+      const { row, column, hit, defeated } = action;
       const newBoard = state.opponentBoard.map((arr) => arr.slice());
 
       newBoard[row][column] = hit ? CELL_HIT : CELL_MISS;
@@ -26,10 +27,11 @@ function gameReducer(state, action) {
         opponentBoard: newBoard,
         message: action.message,
         turn: !state.turn,
+        victory: defeated ? true : state.victory,
       };
     }
     case "receiveShot": {
-      const { row, column } = action;
+      const { row, column, defeated } = action;
       const newBoard = state.playerBoard.map((arr) => arr.slice());
       newBoard[row][column] = {
         ...state.playerBoard[row][column],
@@ -41,6 +43,7 @@ function gameReducer(state, action) {
         playerBoard: newBoard,
         message: action.message,
         turn: !state.turn,
+        victory: defeated ? false : state.victory,
       };
     }
     default:
@@ -57,6 +60,7 @@ export default function Game({ location }) {
     player,
     turn: false,
     message: "",
+    victory: null,
   });
 
   React.useEffect(() => {
@@ -64,11 +68,11 @@ export default function Game({ location }) {
 
     socket.on("startGame", (player) => dispatch({ type: "startGame", player }));
 
-    socket.on("shotResult", (row, column, hit, message) =>
-      dispatch({ type: "shotResult", row, column, hit, message })
+    socket.on("shotResult", (row, column, hit, message, defeated) =>
+      dispatch({ type: "shotResult", row, column, hit, message, defeated })
     );
-    socket.on("receiveShot", (row, column, message) =>
-      dispatch({ type: "receiveShot", row, column, message })
+    socket.on("receiveShot", (row, column, message, defeated) =>
+      dispatch({ type: "receiveShot", row, column, message, defeated })
     );
 
     socket.emit("gameReady");
@@ -89,7 +93,7 @@ export default function Game({ location }) {
       ? (row, column) => socket.emit("shoot", { row, column })
       : null;
 
-  const { playerBoard, opponentBoard, turn, message } = state;
+  const { playerBoard, opponentBoard, turn, message, victory } = state;
 
   if (playerBoard === undefined) {
     // Get Board state from the Server?
@@ -99,12 +103,17 @@ export default function Game({ location }) {
 
   return (
     <div className={styles.table}>
+      {victory !== null ? (
+        <Modal withCloseButton={false}>
+          <h2>{victory === true ? "You win!" : "You lose :("}</h2>
+        </Modal>
+      ) : null}
       <h2 className={styles.info}>
         {message && <span style={{ display: `block` }}>{message}</span>}
         {turn ? (
-          <span>It's your turn!</span>
+          <span>It's your turn ...</span>
         ) : (
-          <span>It's {opponentName}'s turn!</span>
+          <span>It's {opponentName}'s turn ...</span>
         )}
       </h2>
       <Board board={playerBoard} interactive={false} />

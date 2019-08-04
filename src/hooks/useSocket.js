@@ -1,22 +1,25 @@
 import React from "react";
-
 import openSocket from "socket.io-client";
+
+import FlashState from "../util/FlashState";
 
 export default function useSocket() {
   const [socket, setSocket] = React.useState(null);
   const [player, setPlayer] = React.useState(null);
   const [attemptConnect, setAttemptConnect] = React.useState(false);
   const [opponentName, setOpponentName] = React.useState("");
+  const [redirectHome, setRedirectHome] = React.useState(false);
 
   const connect = () => {
+    setRedirectHome(false);
     setAttemptConnect(true);
   };
 
-  const disconnect = () => {
+  const disconnect = React.useCallback(() => {
     setAttemptConnect(false);
     setPlayer(null);
     socket.close();
-  };
+  }, [socket]);
 
   React.useEffect(() => {
     if (attemptConnect && socket === null) {
@@ -31,19 +34,33 @@ export default function useSocket() {
 
     socket.on("connected", (player) => setPlayer(player));
     socket.on("names", ({ playerOne, playerTwo }) =>
-      setOpponentName(player === "playerOne" ? playerTwo : playerTwo)
+      setOpponentName(player === "playerOne" ? playerTwo : playerOne)
     );
     socket.on("disconnect", () => {
       console.log("Disconnected");
       setSocket(null);
+    });
+    // Just close socket for now - will want better handling of this
+    socket.on("opponentDisconnect", () => {
+      disconnect()
+      setRedirectHome(true);
     });
 
     return () => {
       socket.off("connected");
       socket.off("names");
       socket.off("disconnect");
+      socket.off("opponentDisconnect");
     };
-  }, [socket, player]);
+  }, [socket, player, disconnect]);
+
+  React.useEffect(() => {
+    if (!redirectHome) return;
+
+    FlashState.set("redirectHome", true);
+    FlashState.set("redirectMessage", `${opponentName} disconnected`);
+    setRedirectHome(false);
+  }, [redirectHome, opponentName]);
 
   return [socket, player, connect, disconnect, opponentName];
 }

@@ -6,6 +6,7 @@ import Loading from "./Loading";
 
 import styles from "./styles/Prep.module.scss";
 
+import FlashState from "../util/FlashState"
 import { FREE_CELL } from "../util/variables";
 import usePlacement from "../hooks/usePlacement";
 import SocketContex from "../contexts/socket";
@@ -168,6 +169,8 @@ export default function Prep() {
   const [redirect, setRedirect] = React.useState(false);
 
   React.useEffect(() => {
+    if (socket === null) return;
+
     socket.on("redirect", () => {
       setRedirect(true);
     });
@@ -257,9 +260,15 @@ export default function Prep() {
 
   const { board, placeable } = state;
 
-  return redirect ? (
-    <Redirect to={{ pathname: "/game", state: { board } }} />
-  ) : (
+  if (FlashState.get('redirectHome')) {
+    return <Redirect to="/" />;
+  }
+
+  if (redirect) {
+    return <Redirect to={{ pathname: "/game", state: { board } }} />;
+  }
+
+  return (
     <React.Fragment>
       {waiting && <Loading text={`Waiting for ${opponentName} `} speed={400} />}
       <h2 style={{ textAlign: `center` }}>Prepare your Ships!</h2>
@@ -328,6 +337,7 @@ export default function Prep() {
           <button onClick={toggleOrientation}>Toggle Rotation (T)</button>
           {shipsLeft > 0 || (
             <button
+              style={{ display: `block` }}
               onClick={() => {
                 if (socket !== null) {
                   socket.emit("initialise_board", board);
@@ -335,7 +345,7 @@ export default function Prep() {
                 setWaiting(true);
               }}
             >
-              Test Me
+              Ready!
             </button>
           )}
         </div>

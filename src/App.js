@@ -20,7 +20,7 @@ function App() {
       player,
       connect,
       disconnect,
-      opponentName
+      opponentName,
     }),
     [socket, player, connect, disconnect, opponentName]
   );
