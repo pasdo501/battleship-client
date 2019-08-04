@@ -3,11 +3,11 @@ import PropTypes from "prop-types";
 
 import InfoRow from "./InfoRow";
 
-import { FREE_CELL, CELL_HIT } from "../util/variables"
+import { FREE_CELL, CELL_HIT } from "../util/variables";
 
 import styles from "./styles/Board.module.scss";
 
-export default function Board({ board, interactive }) {
+export default function Board({ board, interactive, shoot = null }) {
   return (
     <div className={styles.board}>
       <InfoRow />
@@ -18,15 +18,15 @@ export default function Board({ board, interactive }) {
             let targeted = false;
             let hit = false;
 
-            if (! interactive) {
+            if (!interactive) {
               targeted = column.targeted !== undefined;
               // If column type is unset, there is not ship on this square
-              hit = targeted && column.type
+              hit = targeted && column.type;
             } else {
-              targeted = column !== FREE_CELL
-              hit = targeted && column === CELL_HIT
+              targeted = column !== FREE_CELL;
+              hit = targeted && column === CELL_HIT;
             }
-            
+
             return (
               <div
                 key={`column-${index}-${cIndex}`}
@@ -38,6 +38,7 @@ export default function Board({ board, interactive }) {
                     ? column.type.color
                     : column.color,
                 }}
+                onClick={interactive && !targeted ? () => shoot(index, cIndex) : null}
               >
                 {targeted && (
                   <span className={hit ? styles.hit : styles.miss}>
@@ -56,5 +57,5 @@ export default function Board({ board, interactive }) {
 Board.propTypes = {
   board: PropTypes.array.isRequired,
   interactive: PropTypes.bool.isRequired,
-  attrs: PropTypes.object,
+  shoot: PropTypes.func,
 };

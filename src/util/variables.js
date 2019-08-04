@@ -1,5 +1,6 @@
 export const FREE_CELL = 0;
 export const CELL_HIT = 1;
+export const CELL_MISS = 2;
 
 export const CARRIER = {
     name: 'Carrier',
