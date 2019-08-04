@@ -7,12 +7,12 @@ import Home from "./components/Home";
 import Prep from "./components/Prep";
 import Game from "./components/Game";
 
-import useSocket from "./hooks/useSocket"
+import useSocket from "./hooks/useSocket";
 
 import "./App.scss";
 
 function App() {
-  const [socket, connect] = useSocket()
+  const [socket, connect] = useSocket();
 
   const contextValue = React.useMemo(
     () => ({

@@ -2,12 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import InfoRow from "./InfoRow";
+import Loading from "./Loading";
 
 import styles from "./styles/Prep.module.scss";
 
 import { FREE_CELL } from "../util/variables";
 import usePlacement from "../hooks/usePlacement";
-import SocketContex from "../contexts/socket"
+import SocketContex from "../contexts/socket";
 
 function getHoverCoordinates({ row, column, orientation, size }) {
   if (row === -1 || column === -1) {
@@ -117,9 +118,12 @@ function prepReducer(state, action) {
     case "shipType":
       return {
         ...state,
-        shipType: action.shipType,
+        shipType: action.shipType === state.shipType ? null : action.shipType,
       };
     case "pickup":
+      // Bail out early if the player is already holding
+      // a ship
+      if (state.shipType !== null) return state
       const [row, column] = action.head;
       const coords = getHoverCoordinates({
         row,
@@ -162,8 +166,9 @@ function constructEmptyBoard() {
 }
 
 export default function Prep() {
-  const { socket } = React.useContext(SocketContex)
-  
+  const { socket } = React.useContext(SocketContex);
+  const [waiting, setWaiting] = React.useState(false);
+
   const [
     placementObjects,
     decrementType,
@@ -228,6 +233,7 @@ export default function Prep() {
   const pickupShip = ({ type, head, orientation }) => {
     const increment = () => incrementType(type.type);
     dispatch({ type: "pickup", shipType: type, head, orientation, increment });
+    setOrigin((origin) => ({...origin, size: type.size}))
   };
 
   React.useEffect(() => {
@@ -246,6 +252,7 @@ export default function Prep() {
 
   return (
     <React.Fragment>
+      {waiting && <Loading text="Waiting" speed={400} />}
       <h2 style={{ textAlign: `center` }}>Prepare your Ships!</h2>
 
       <div className={styles.wrapper}>
@@ -281,7 +288,7 @@ export default function Prep() {
         <div className={styles.options}>
           <table className={styles.table}>
             <tbody>
-              {placementObjects.map((type, index) => (
+              {placementObjects.map((type) => (
                 <tr key={type.name} onClick={() => handleTypeChange(type)}>
                   <td
                     style={
@@ -311,8 +318,16 @@ export default function Prep() {
           </table>
           <button onClick={toggleOrientation}>Toggle Rotation (T)</button>
           {shipsLeft > 0 || (
-
-            <button onClick={() => socket.emit('initialise_board', board)}>Test Me</button>
+            <button
+              onClick={() => {
+                if (socket !== null) {
+                  socket.emit("initialise_board", board);
+                }
+                setWaiting(true);
+              }}
+            >
+              Test Me
+            </button>
           )}
         </div>
       </div>
