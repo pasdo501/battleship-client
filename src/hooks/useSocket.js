@@ -23,9 +23,12 @@ export default function useSocket() {
     }
     socket.on("connected", (player) => setPlayer(player));
     socket.on("disconnect", () => console.log('Disconnected'))
-  }, [socket]);
 
-  console.log(player)
+    return () => {
+        socket.off("connected")
+        socket.off("disconnect")
+    }
+  }, [socket]);
 
   return [socket, connect];
 }

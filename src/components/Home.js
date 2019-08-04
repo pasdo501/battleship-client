@@ -1,32 +1,43 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
-import SocketContext from "../contexts/socket"
+import Loading from "./Loading";
+
+import SocketContext from "../contexts/socket";
 
 export default function Home() {
-  const { connect } = React.useContext(SocketContext)
-  React.useEffect(connect, [])
+  const { socket, connect } = React.useContext(SocketContext);
+  const [waiting, setWaiting] = React.useState(false);
+  const [redirect, setRedirect] = React.useState(false);
+
+  const requestGame = () => {
+    setWaiting(true);
+    connect();
+  };
+
+  React.useEffect(() => {
+    if (socket === null) {
+      return;
+    }
+
+    socket.on("playersReady", () => setRedirect(true));
+
+    return () => socket.off("playersReady")
+  }, [socket]);
+
+  if (redirect) {
+    return <Redirect to="/prep" />;
+  }
 
   return (
     <React.Fragment>
+      {waiting && <Loading text="Waiting for another player " />}
       <div>Home component</div>
       <div>
         <Link to="/prep">Prep</Link>
       </div>
       <div>
-        <Link to="/game">Nothing passed</Link>
-      </div>
-      <div>
-        <Link
-          to={{
-            pathname: "/game",
-            state: {
-              id: "someId",
-            },
-          }}
-        >
-          Passing something
-        </Link>
+        <button onClick={requestGame}>Attempt to Join</button>
       </div>
     </React.Fragment>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 import InfoRow from "./InfoRow";
 import Loading from "./Loading";
@@ -10,7 +10,7 @@ import { FREE_CELL } from "../util/variables";
 import usePlacement from "../hooks/usePlacement";
 import SocketContex from "../contexts/socket";
 
-function getHoverCoordinates({ row, column, orientation, size }) {
+function getCoords({ row, column, orientation, size }) {
   if (row === -1 || column === -1) {
     return [];
   }
@@ -35,7 +35,7 @@ function prepReducer(state, action) {
       let placeable = true;
 
       const newBoard = [...state.board];
-      const hoverCoordinates = getHoverCoordinates(action.origin);
+      const hoverCoordinates = getCoords(action.origin);
       if (hoverCoordinates.length === 0) {
         return {
           ...state,
@@ -86,7 +86,7 @@ function prepReducer(state, action) {
         column: action.column,
       };
       let head = null;
-      for (let [row, column] of getHoverCoordinates(origin)) {
+      for (let [row, column] of getCoords(origin)) {
         newBoard[row][column] = {
           ...newBoard[row][column],
           type: state.shipType,
@@ -121,11 +121,8 @@ function prepReducer(state, action) {
         shipType: action.shipType === state.shipType ? null : action.shipType,
       };
     case "pickup":
-      // Bail out early if the player is already holding
-      // a ship
-      if (state.shipType !== null) return state
       const [row, column] = action.head;
-      const coords = getHoverCoordinates({
+      const coords = getCoords({
         row,
         column,
         orientation: action.orientation,
@@ -168,6 +165,13 @@ function constructEmptyBoard() {
 export default function Prep() {
   const { socket } = React.useContext(SocketContex);
   const [waiting, setWaiting] = React.useState(false);
+  const [redirect, setRedirect] = React.useState(false);
+
+  React.useEffect(() => {
+    socket.on("redirect", () => {
+      setRedirect(true);
+    });
+  }, [socket]);
 
   const [
     placementObjects,
@@ -175,6 +179,7 @@ export default function Prep() {
     incrementType,
     shipsLeft,
   ] = usePlacement();
+
   const [state, dispatch] = React.useReducer(prepReducer, {
     board: React.useMemo(() => constructEmptyBoard(), []),
     hoverCoordinates: [],
@@ -182,7 +187,6 @@ export default function Prep() {
     shipType: null,
   });
 
-  // [row, column, orientation, size]
   const [origin, setOrigin] = React.useState({
     row: -1,
     column: -1,
@@ -231,9 +235,12 @@ export default function Prep() {
   };
 
   const pickupShip = ({ type, head, orientation }) => {
+    // Bail out early if already holding a ship
+    if (state.shipType !== null) return;
+
     const increment = () => incrementType(type.type);
     dispatch({ type: "pickup", shipType: type, head, orientation, increment });
-    setOrigin((origin) => ({...origin, size: type.size}))
+    setOrigin((origin) => ({ ...origin, size: type.size }));
   };
 
   React.useEffect(() => {
@@ -250,7 +257,9 @@ export default function Prep() {
 
   const { board, placeable } = state;
 
-  return (
+  return redirect ? (
+    <Redirect to={{ pathname: "/game", state: { board } }} />
+  ) : (
     <React.Fragment>
       {waiting && <Loading text="Waiting" speed={400} />}
       <h2 style={{ textAlign: `center` }}>Prepare your Ships!</h2>
