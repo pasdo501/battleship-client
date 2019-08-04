@@ -49,7 +49,7 @@ function gameReducer(state, action) {
 }
 
 export default function Game({ location }) {
-  const { socket, player } = React.useContext(SocketContext);
+  const { socket, player, opponentName } = React.useContext(SocketContext);
 
   const [state, dispatch] = React.useReducer(gameReducer, {
     playerBoard: location.state && location.state.board,
@@ -100,12 +100,12 @@ export default function Game({ location }) {
   return (
     <div className={styles.table}>
       <h2 className={styles.info}>
-        {turn ? (
-          <span>It's your turn</span>
-        ) : (
-          <span>It's the other player's turn</span>
-        )}
         {message && <span style={{ display: `block` }}>{message}</span>}
+        {turn ? (
+          <span>It's your turn!</span>
+        ) : (
+          <span>It's {opponentName}'s turn!</span>
+        )}
       </h2>
       <Board board={playerBoard} interactive={false} />
       <Board board={opponentBoard} interactive={true} shoot={shoot} />

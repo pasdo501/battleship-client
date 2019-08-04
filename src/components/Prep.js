@@ -163,7 +163,7 @@ function constructEmptyBoard() {
 }
 
 export default function Prep() {
-  const { socket } = React.useContext(SocketContex);
+  const { socket, opponentName } = React.useContext(SocketContex);
   const [waiting, setWaiting] = React.useState(false);
   const [redirect, setRedirect] = React.useState(false);
 
@@ -261,7 +261,7 @@ export default function Prep() {
     <Redirect to={{ pathname: "/game", state: { board } }} />
   ) : (
     <React.Fragment>
-      {waiting && <Loading text="Waiting" speed={400} />}
+      {waiting && <Loading text={`Waiting for ${opponentName} `} speed={400} />}
       <h2 style={{ textAlign: `center` }}>Prepare your Ships!</h2>
 
       <div className={styles.wrapper}>

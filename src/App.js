@@ -12,16 +12,17 @@ import useSocket from "./hooks/useSocket";
 import "./App.scss";
 
 function App() {
-  const [socket, player, connect, disconnect] = useSocket();
+  const [socket, player, connect, disconnect, opponentName] = useSocket();
 
   const contextValue = React.useMemo(
     () => ({
       socket,
       player,
       connect,
-      disconnect
+      disconnect,
+      opponentName
     }),
-    [socket, player, connect, disconnect]
+    [socket, player, connect, disconnect, opponentName]
   );
 
   return (

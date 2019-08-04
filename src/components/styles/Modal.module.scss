@@ -1,0 +1,48 @@
+@import "../../variables";
+
+.modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    min-height: calc(100vh - #{$header_height});
+    z-index: 100;
+    background-color: white;
+    opacity: 0;
+    transition: opacity .5s ease;
+
+    &.visible {
+        opacity: 1;
+    }
+}
+
+.wrapper {
+    position: relative;
+    width: 75%;
+    height: 75%;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 1px solid black;
+    background-color: transparent;
+    border-radius: 100%;
+    width: 2rem;
+    height: 2rem;
+
+    &:hover {
+        background-color: whitesmoke;
+        cursor: pointer;
+    }
+}

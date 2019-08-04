@@ -1,3 +1,5 @@
+@import "../../variables";
+
 .wrapper {
     position: absolute;
     top: 0;
@@ -9,5 +11,5 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 10rem);
+    min-height: calc(100vh - #{$header_height});
 }

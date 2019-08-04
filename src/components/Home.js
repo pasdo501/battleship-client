@@ -2,16 +2,27 @@ import React from "react";
 import { Redirect } from "react-router-dom";
 
 import Loading from "./Loading";
+import Modal from "./Modal";
 
 import SocketContext from "../contexts/socket";
 import styles from "./styles/Home.module.scss";
 
 export default function Home() {
   const { socket, connect, disconnect } = React.useContext(SocketContext);
+  const [showModal, setShowModal] = React.useState(false);
   const [waiting, setWaiting] = React.useState(false);
   const [redirect, setRedirect] = React.useState(false);
+  const [name, setName] = React.useState('')
+  const inputRef = React.useRef();
 
   const requestGame = () => {
+    const playerName = inputRef.current.value.trim();
+    if (playerName.length < 1) {
+      window.alert("Please enter a name");
+      return
+    }
+    setShowModal(false)
+    setName(playerName)
     setWaiting(true);
     connect();
   };
@@ -26,10 +37,14 @@ export default function Home() {
       return;
     }
 
+    console.log(name)
+    console.log(socket)
+    socket.emit("name", name);
+
     socket.on("playersReady", () => setRedirect(true));
 
     return () => socket.off("playersReady");
-  }, [socket]);
+  }, [socket, name]);
 
   if (redirect) {
     return <Redirect to="/prep" />;
@@ -45,9 +60,21 @@ export default function Home() {
         />
       )}
       <div>
-        <button className={styles.bigButton} onClick={requestGame}>
+        <button className={styles.bigButton} onClick={() => setShowModal(true)}>
           Join Game
         </button>
+        {showModal && (
+          <Modal handleHide={() => setShowModal(false)}>
+            <input ref={inputRef} type="text" placeholder="Enter a name" />
+            <button
+              style={{ breakBefore: `always` }}
+              className={styles.bigButton}
+              onClick={requestGame}
+            >
+              Join
+            </button>
+          </Modal>
+        )}
       </div>
     </React.Fragment>
   );
