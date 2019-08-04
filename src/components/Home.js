@@ -1,7 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+import SocketContext from "../contexts/socket"
+
 export default function Home() {
+  const { connect } = React.useContext(SocketContext)
+  React.useEffect(connect, [])
+
   return (
     <React.Fragment>
       <div>Home component</div>

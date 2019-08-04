@@ -7,6 +7,7 @@ import styles from "./styles/Prep.module.scss";
 
 import { FREE_CELL } from "../util/variables";
 import usePlacement from "../hooks/usePlacement";
+import SocketContex from "../contexts/socket"
 
 function getHoverCoordinates({ row, column, orientation, size }) {
   if (row === -1 || column === -1) {
@@ -161,6 +162,8 @@ function constructEmptyBoard() {
 }
 
 export default function Prep() {
+  const { socket } = React.useContext(SocketContex)
+  
   const [
     placementObjects,
     decrementType,
@@ -308,16 +311,8 @@ export default function Prep() {
           </table>
           <button onClick={toggleOrientation}>Toggle Rotation (T)</button>
           {shipsLeft > 0 || (
-            <Link
-              to={{
-                pathname: "/game",
-                state: {
-                  board,
-                },
-              }}
-            >
-              Done
-            </Link>
+
+            <button onClick={() => socket.emit('initialise_board', board)}>Test Me</button>
           )}
         </div>
       </div>
