@@ -10,6 +10,12 @@ export default function useSocket() {
   const connect = () => {
       setAttemptConnect(true)
   }
+  
+  const disconnect = () => {
+      setAttemptConnect(false)
+      setPlayer(null)
+      socket.close()
+  }
 
   React.useEffect(() => {
     if (attemptConnect && socket === null) {
@@ -22,7 +28,10 @@ export default function useSocket() {
       return;
     }
     socket.on("connected", (player) => setPlayer(player));
-    socket.on("disconnect", () => console.log('Disconnected'))
+    socket.on("disconnect", () => {
+        console.log('Disconnected')
+        setSocket(null)
+    })
 
     return () => {
         socket.off("connected")
@@ -30,5 +39,5 @@ export default function useSocket() {
     }
   }, [socket]);
 
-  return [socket, connect];
+  return [socket, connect, disconnect];
 }

@@ -1,18 +1,24 @@
 import React from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 import Loading from "./Loading";
 
 import SocketContext from "../contexts/socket";
+import styles from "./styles/Home.module.scss";
 
 export default function Home() {
-  const { socket, connect } = React.useContext(SocketContext);
+  const { socket, connect, disconnect } = React.useContext(SocketContext);
   const [waiting, setWaiting] = React.useState(false);
   const [redirect, setRedirect] = React.useState(false);
 
   const requestGame = () => {
     setWaiting(true);
     connect();
+  };
+
+  const cancelRequest = () => {
+    setWaiting(false);
+    disconnect();
   };
 
   React.useEffect(() => {
@@ -22,7 +28,7 @@ export default function Home() {
 
     socket.on("playersReady", () => setRedirect(true));
 
-    return () => socket.off("playersReady")
+    return () => socket.off("playersReady");
   }, [socket]);
 
   if (redirect) {
@@ -31,13 +37,17 @@ export default function Home() {
 
   return (
     <React.Fragment>
-      {waiting && <Loading text="Waiting for another player " />}
-      <div>Home component</div>
+      {waiting && (
+        <Loading
+          onClick={cancelRequest}
+          style={{ cursor: `pointer` }}
+          text="Waiting for another player (click to cancel) "
+        />
+      )}
       <div>
-        <Link to="/prep">Prep</Link>
-      </div>
-      <div>
-        <button onClick={requestGame}>Attempt to Join</button>
+        <button className={styles.bigButton} onClick={requestGame}>
+          Join Game
+        </button>
       </div>
     </React.Fragment>
   );

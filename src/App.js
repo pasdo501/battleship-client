@@ -12,14 +12,15 @@ import useSocket from "./hooks/useSocket";
 import "./App.scss";
 
 function App() {
-  const [socket, connect] = useSocket();
+  const [socket, connect, disconnect] = useSocket();
 
   const contextValue = React.useMemo(
     () => ({
       socket,
       connect,
+      disconnect
     }),
-    [socket, connect]
+    [socket, connect, disconnect]
   );
 
   return (
