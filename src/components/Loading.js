@@ -11,8 +11,9 @@ export default function Loading({ text = "Loading", speed = 300 }) {
       setContent((content) =>
         content === `${text}...` ? text : `${content}.`
       );
-      return () => window.clearInterval(intervalId);
     }, speed);
+
+    return () => window.clearInterval(intervalId);
   }, [text, speed]);
 
   return (
