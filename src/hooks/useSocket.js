@@ -3,6 +3,11 @@ import openSocket from "socket.io-client";
 
 import FlashState from "../util/FlashState";
 
+const hostAddr =
+  process.env.NODE_ENV === "production"
+    ? "http://connect-4-server-connect-4-server.apps.us-east-1.online-starter.openshift.com"
+    : "localhost:8080";
+
 export default function useSocket() {
   const [socket, setSocket] = React.useState(null);
   const [player, setPlayer] = React.useState(null);
@@ -23,7 +28,7 @@ export default function useSocket() {
 
   React.useEffect(() => {
     if (attemptConnect && socket === null) {
-      setSocket(openSocket("localhost:8080"));
+      setSocket(openSocket(hostAddr));
     }
   }, [attemptConnect, socket]);
 
@@ -42,7 +47,7 @@ export default function useSocket() {
     });
     // Just close socket for now - will want better handling of this
     socket.on("opponentDisconnect", () => {
-      disconnect()
+      disconnect();
       setRedirectHome(true);
     });
 
