@@ -14,10 +14,14 @@ export default function useSocket() {
   const [attemptConnect, setAttemptConnect] = React.useState(false);
   const [opponentName, setOpponentName] = React.useState("");
   const [redirectHome, setRedirectHome] = React.useState(false);
+  const [roomId, setRoomId] = React.useState(null)
 
-  const connect = () => {
+  const connect = (roomId = null) => {
     setRedirectHome(false);
     setAttemptConnect(true);
+    if (roomId !== null) {
+      setRoomId(roomId)
+    }
   };
 
   const disconnect = React.useCallback(() => {
@@ -28,9 +32,13 @@ export default function useSocket() {
 
   React.useEffect(() => {
     if (attemptConnect && socket === null) {
-      setSocket(openSocket(hostAddr));
+      setSocket(
+        openSocket(hostAddr, {
+          query: { type: "battleship", roomId },
+        })
+      );
     }
-  }, [attemptConnect, socket]);
+  }, [attemptConnect, socket, roomId]);
 
   React.useEffect(() => {
     if (socket === null) {

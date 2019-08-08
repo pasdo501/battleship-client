@@ -1,6 +1,5 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
-import PropTypes from "prop-types";
 
 import Loading from "./Loading";
 import Modal from "./Modal";
@@ -9,42 +8,117 @@ import FlashState from "../util/FlashState";
 import SocketContext from "../contexts/socket";
 import styles from "./styles/Home.module.scss";
 
-export default function Home({ location }) {
-  const { socket, connect, disconnect } = React.useContext(SocketContext);
-  const [showModal, setShowModal] = React.useState(false);
-  const [waiting, setWaiting] = React.useState(false);
-  const [redirect, setRedirect] = React.useState(false);
-  const [name, setName] = React.useState("");
-  const inputRef = React.useRef();
+function homeReducer(state, action) {
+  switch (action.type) {
+    case "startModal":
+      return {
+        ...state,
+        joining: false,
+        showModal: true,
+      };
+    case "joinModal":
+      return {
+        ...state,
+        joining: true,
+        showModal: true,
+      };
+    case "hideModal":
+      return {
+        ...state,
+        showModal: false,
+      };
+    case "startGame":
+      return {
+        ...state,
+        showModal: false,
+        name: action.name,
+        waiting: true,
+      };
+    case "joinGame":
+      return {
+        ...state,
+        name: action.name,
+      };
+    case "redirectReady":
+      return {
+        ...state,
+        redirect: true,
+      };
+    case "cancelWait":
+      return {
+        ...state,
+        waiting: false,
+      };
+    default:
+      throw new Error("Invalid action type");
+  }
+}
 
-  const requestGame = () => {
-    const playerName = inputRef.current.value.trim();
+export default function Home() {
+  const [state, dispatch] = React.useReducer(homeReducer, {
+    joining: false,
+    showModal: false,
+    redirect: false,
+    name: "",
+    waiting: false,
+  });
+
+  const { socket, connect, disconnect } = React.useContext(SocketContext);
+  const [roomId, setRoomId] = React.useState("");
+  const nameRef = React.useRef();
+  const idRef = React.useRef();
+
+  const startGame = () => {
+    const playerName = nameRef.current.value.trim();
     if (playerName.length < 1) {
       window.alert("Please enter a name");
       return;
     }
-    setShowModal(false);
-    setName(playerName);
-    setWaiting(true);
+    dispatch({ type: "startGame", name: playerName });
     connect();
   };
 
-  const cancelRequest = () => {
-    setWaiting(false);
-    disconnect();
+  const joinGame = () => {
+    const playerName = nameRef.current.value.trim();
+    if (playerName.length < 1) {
+      window.alert("Please enter a name");
+      return;
+    }
+    const gameId = idRef.current ? idRef.current.value.trim() : "";
+    if (gameId.length < 1) {
+      window.alert("Please enter a Game ID");
+      return;
+    }
+    dispatch({ type: "joinGame", name: playerName });
+    connect(gameId);
   };
+
+  const cancelRequest = React.useCallback(() => {
+    dispatch({ type: "cancelWait" });
+    setRoomId("");
+    disconnect();
+  }, [disconnect]);
 
   React.useEffect(() => {
     if (socket === null) {
       return;
     }
 
-    socket.emit("name", name);
+    socket.emit("name", state.name);
 
-    socket.on("playersReady", () => setRedirect(true));
+    socket.on("invalidRoom", (message) => {
+      window.alert(message);
+      cancelRequest();
+    });
+    socket.on("roomAllocation", (roomId) => setRoomId(roomId));
+    socket.on("playersReady", () => dispatch({ type: "redirectReady" }));
 
-    return () => socket.off("playersReady");
-  }, [socket, name]);
+    return () => {
+      socket.off("invalidRoom");
+      socket.off("roomAllocation");
+      socket.off("playersReady");
+    };
+  }, [socket, state.name, cancelRequest]);
 
   React.useEffect(() => {
     const message = FlashState.get("redirectMessage");
@@ -53,6 +127,11 @@ export default function Home({ location }) {
       window.alert(message);
     }
   }, []);
+
+  const { showModal, redirect, waiting, joining } = state;
+  const loadingText = waiting
+    ? `Your game ID is ${roomId}. Waiting for another player (click to cancel) `
+    : "";
 
   if (redirect) {
     return <Redirect to="/prep" />;
@@ -64,20 +143,30 @@ export default function Home({ location }) {
         <Loading
           onClick={cancelRequest}
           style={{ cursor: `pointer` }}
-          text="Waiting for another player (click to cancel) "
+          text={loadingText}
         />
       )}
       <div>
-        <button className={styles.bigButton} onClick={() => setShowModal(true)}>
+        <button
+          className={styles.bigButton}
+          onClick={() => dispatch({ type: "startModal" })}
+        >
+          Start Game
+        </button>
+        <button
+          className={styles.bigButton}
+          onClick={() => dispatch({ type: "joinModal" })}
+        >
           Join Game
         </button>
         {showModal && (
-          <Modal handleHide={() => setShowModal(false)}>
-            <input ref={inputRef} type="text" placeholder="Enter a name" />
+          <Modal handleHide={() => dispatch({ type: "hideModal" })}>
+            <input ref={nameRef} type="text" placeholder="Your Name" />
+            {joining && <input ref={idRef} type="text" placeholder="Game ID" />}
             <button
               style={{ breakBefore: `always` }}
               className={styles.bigButton}
-              onClick={requestGame}
+              onClick={() => (joining ? joinGame() : startGame())}
             >
               Join
             </button>
@@ -87,7 +176,3 @@ export default function Home({ location }) {
     </React.Fragment>
   );
 }
-
-Home.propTypes = {
-  location: PropTypes.object.isRequired,
-};
