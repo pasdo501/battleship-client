@@ -168,7 +168,7 @@ export default function Home() {
               className={styles.bigButton}
               onClick={() => (joining ? joinGame() : startGame())}
             >
-              Join
+              {joining ? 'Join' : 'Start'}
             </button>
           </Modal>
         )}

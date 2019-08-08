@@ -19,9 +19,7 @@ export default function useSocket() {
   const connect = (roomId = null) => {
     setRedirectHome(false);
     setAttemptConnect(true);
-    if (roomId !== null) {
-      setRoomId(roomId)
-    }
+    setRoomId(roomId)
   };
 
   const disconnect = React.useCallback(() => {
