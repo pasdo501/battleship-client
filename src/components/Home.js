@@ -146,7 +146,7 @@ export default function Home() {
           text={loadingText}
         />
       )}
-      <div>
+      <div className={styles.wrapper}>
         <button
           className={styles.bigButton}
           onClick={() => dispatch({ type: "startModal" })}

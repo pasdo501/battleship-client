@@ -102,7 +102,7 @@ export default function Game({ location }) {
   }
 
   return (
-    <div className={styles.table}>
+    <section className={styles.table}>
       {victory !== null ? (
         <Modal withCloseButton={false}>
           <h2>{victory === true ? "You win!" : "You lose :("}</h2>
@@ -118,6 +118,6 @@ export default function Game({ location }) {
       </h2>
       <Board board={playerBoard} interactive={false} />
       <Board board={opponentBoard} interactive={true} shoot={shoot} />
-    </div>
+    </section>
   );
 }

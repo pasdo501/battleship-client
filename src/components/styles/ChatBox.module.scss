@@ -1,0 +1,30 @@
+.wrapper {
+    flex: 1 1 auto;
+    max-width: 1000px;
+    padding-top: 4rem;
+}
+
+.chatBox {
+    display: flex;
+    flex-direction: column;
+    height: 200px;
+    overflow-y: auto;
+
+    div {
+        flex-grow: unset;
+    }
+}
+
+.chatItem {
+    span {
+        padding-right: 1rem;
+    }
+}
+
+.time {
+    font-weight: lighter;
+}
+
+.textInput {
+    width: 100%;
+}

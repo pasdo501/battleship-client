@@ -5,6 +5,10 @@
     justify-content: space-between;
 }
 
+.prepSection {
+    flex: 2 2 auto;
+}
+
 .options {
     flex: 0.35 0.35 auto;
 
@@ -58,8 +62,4 @@
         background-color: black;
         border: 1px solid white;
     }
-}
-
-.prepMain {
-    max-width: 1000px;
 }

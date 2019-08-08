@@ -14,12 +14,12 @@ export default function useSocket() {
   const [attemptConnect, setAttemptConnect] = React.useState(false);
   const [opponentName, setOpponentName] = React.useState("");
   const [redirectHome, setRedirectHome] = React.useState(false);
-  const [roomId, setRoomId] = React.useState(null)
+  const [roomId, setRoomId] = React.useState(null);
 
   const connect = (roomId = null) => {
     setRedirectHome(false);
     setAttemptConnect(true);
-    setRoomId(roomId)
+    setRoomId(roomId);
   };
 
   const disconnect = React.useCallback(() => {
