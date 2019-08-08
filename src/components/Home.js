@@ -161,15 +161,29 @@ export default function Home() {
         </button>
         {showModal && (
           <Modal handleHide={() => dispatch({ type: "hideModal" })}>
-            <input ref={nameRef} type="text" placeholder="Your Name" />
-            {joining && <input ref={idRef} type="text" placeholder="Game ID" />}
-            <button
-              style={{ breakBefore: `always` }}
-              className={styles.bigButton}
-              onClick={() => (joining ? joinGame() : startGame())}
-            >
-              {joining ? 'Join' : 'Start'}
-            </button>
+            <div>
+              <input
+                className={styles.input}
+                ref={nameRef}
+                type="text"
+                placeholder="Your Name"
+              />
+              {joining && (
+                <input
+                  className={styles.input}
+                  ref={idRef}
+                  type="text"
+                  placeholder="Game ID"
+                />
+              )}
+              <button
+                style={{ breakBefore: `always` }}
+                className={styles.bigButton}
+                onClick={() => (joining ? joinGame() : startGame())}
+              >
+                {joining ? "Join" : "Start"}
+              </button>
+            </div>
           </Modal>
         )}
       </div>

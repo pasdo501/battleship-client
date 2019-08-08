@@ -39,3 +39,27 @@
         border: 1px solid black;
     }
 }
+
+.button {
+    display: block;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: 1px solid black;
+    cursor: pointer;
+    margin: 1.5rem 0;
+
+    color: black;
+    background-color: white;
+    transition: all .25s ease;
+
+    &:hover {
+        color: white;
+        background-color: black;
+        border: 1px solid white;
+    }
+}
+
+.prepMain {
+    max-width: 1000px;
+}
