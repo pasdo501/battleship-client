@@ -98,25 +98,27 @@ export default function Game({ location }) {
     return <Redirect to="/" />;
   }
 
+  console.log(JSON.stringify(playerBoard));
+
   return (
     <React.Fragment>
-    <h2 className={styles.info}>
+      <h2 className={styles.info}>
         {turn ? (
           <span>It's your turn ...</span>
         ) : (
           <span>It's {opponentName}'s turn ...</span>
         )}
       </h2>
-    <section className={styles.table}>
-      {victory !== null ? (
-        <Modal withCloseButton={false}>
-          <h2>{victory === true ? "You win!" : "You lose :("}</h2>
-        </Modal>
-      ) : null}
-      
-      <Board board={playerBoard} interactive={false} />
-      <Board board={opponentBoard} interactive={true} shoot={shoot} />
-    </section>
+      <section className={styles.table}>
+        {victory !== null ? (
+          <Modal withCloseButton={false}>
+            <h2>{victory === true ? "You win!" : "You lose :("}</h2>
+          </Modal>
+        ) : null}
+
+        <Board board={playerBoard} interactive={false} />
+        <Board board={opponentBoard} interactive={true} shoot={shoot} />
+      </section>
     </React.Fragment>
   );
 }
