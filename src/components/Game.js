@@ -25,7 +25,6 @@ function gameReducer(state, action) {
       return {
         ...state,
         opponentBoard: newBoard,
-        message: action.message,
         turn: !state.turn,
         victory: defeated ? true : state.victory,
       };
@@ -41,7 +40,6 @@ function gameReducer(state, action) {
       return {
         ...state,
         playerBoard: newBoard,
-        message: action.message,
         turn: !state.turn,
         victory: defeated ? false : state.victory,
       };
@@ -59,7 +57,6 @@ export default function Game({ location }) {
     opponentBoard: React.useMemo(() => Array(10).fill(Array(10).fill(0)), []),
     player,
     turn: false,
-    message: "",
     victory: null,
   });
 
@@ -68,11 +65,11 @@ export default function Game({ location }) {
 
     socket.on("startGame", (player) => dispatch({ type: "startGame", player }));
 
-    socket.on("shotResult", (row, column, hit, message, defeated) =>
-      dispatch({ type: "shotResult", row, column, hit, message, defeated })
+    socket.on("shotResult", (row, column, hit, defeated) =>
+      dispatch({ type: "shotResult", row, column, hit, defeated })
     );
-    socket.on("receiveShot", (row, column, message, defeated) =>
-      dispatch({ type: "receiveShot", row, column, message, defeated })
+    socket.on("receiveShot", (row, column, defeated) =>
+      dispatch({ type: "receiveShot", row, column, defeated })
     );
 
     socket.emit("gameReady");
@@ -93,7 +90,7 @@ export default function Game({ location }) {
       ? (row, column) => socket.emit("shoot", { row, column })
       : null;
 
-  const { playerBoard, opponentBoard, turn, message, victory } = state;
+  const { playerBoard, opponentBoard, turn, victory } = state;
 
   if (playerBoard === undefined) {
     // Get Board state from the Server?
@@ -102,22 +99,24 @@ export default function Game({ location }) {
   }
 
   return (
-    <section className={styles.table}>
-      {victory !== null ? (
-        <Modal withCloseButton={false}>
-          <h2>{victory === true ? "You win!" : "You lose :("}</h2>
-        </Modal>
-      ) : null}
-      <h2 className={styles.info}>
-        {message && <span style={{ display: `block` }}>{message}</span>}
+    <React.Fragment>
+    <h2 className={styles.info}>
         {turn ? (
           <span>It's your turn ...</span>
         ) : (
           <span>It's {opponentName}'s turn ...</span>
         )}
       </h2>
+    <section className={styles.table}>
+      {victory !== null ? (
+        <Modal withCloseButton={false}>
+          <h2>{victory === true ? "You win!" : "You lose :("}</h2>
+        </Modal>
+      ) : null}
+      
       <Board board={playerBoard} interactive={false} />
       <Board board={opponentBoard} interactive={true} shoot={shoot} />
     </section>
+    </React.Fragment>
   );
 }

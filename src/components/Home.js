@@ -166,7 +166,7 @@ export default function Home() {
                 className={styles.input}
                 ref={nameRef}
                 type="text"
-                placeholder="Your Name"
+                placeholder="Enter a Name"
               />
               {joining && (
                 <input

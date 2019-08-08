@@ -1,24 +1,36 @@
 .wrapper {
     flex: 1 1 auto;
     max-width: 1000px;
+    width: 30%;
     padding-top: 4rem;
+    align-self: center;
 }
 
 .chatBox {
-    display: flex;
-    flex-direction: column;
+    width: 100%;
     height: 200px;
     overflow-y: auto;
+    display: grid;
+    grid-auto-rows: min-content;
+    padding: .3rem;
+    border: 1px solid #ccc;
+    border-bottom: none;
 
     div {
-        flex-grow: unset;
+        display: grid;
+        grid-template-columns: auto auto 3fr;
+        grid-column-gap: .5rem;
     }
 }
 
-.chatItem {
-    span {
-        padding-right: 1rem;
-    }
+.systemMessage {
+    color: red;
+    font-weight: bold;
+}
+
+.otherMessage {
+    color: navy;
+    font-weight: bold;
 }
 
 .time {
@@ -26,5 +38,8 @@
 }
 
 .textInput {
-    width: 100%;
+    // Calculate width to match chat box with
+    // border & padding
+    width: calc(100% - 2px + .6rem);
+    border: 1px solid #ccc;
 }

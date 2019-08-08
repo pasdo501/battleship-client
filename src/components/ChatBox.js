@@ -15,11 +15,11 @@ export default function ChatBox() {
     socket.on("message", ({ sender, timestamp, message }) => {
       setChat((chat) => {
         const parsed = {
-            time: new Date(timestamp).toLocaleTimeString(),
-            sender,
-            message
-        }
-        return [...chat, parsed]
+          time: new Date(timestamp).toLocaleTimeString(),
+          sender,
+          message,
+        };
+        return [...chat, parsed];
       });
     });
   }, [socket]);
@@ -38,9 +38,9 @@ export default function ChatBox() {
   const handleSubmit = () => {
     if (socket === null) return;
     const message = textRef.current.value;
-    if (message.trim().length > 1) {
-        socket.emit("chat", textRef.current.value);
-        textRef.current.value = '';
+    if (message.trim().length >= 1) {
+      socket.emit("chat", textRef.current.value);
+      textRef.current.value = "";
     }
   };
 
@@ -48,7 +48,16 @@ export default function ChatBox() {
     <div className={styles.wrapper}>
       <div ref={chatBoxRef} className={styles.chatBox}>
         {chat.map(({ time, sender, message }, index) => (
-          <div className={styles.chatItem} key={sender + index}>
+          <div
+            key={sender + index}
+            className={
+              sender === "[SYSTEM]"
+                ? styles.systemMessage
+                : sender === "You"
+                ? ""
+                : styles.otherMessage
+            }
+          >
             <span className={styles.time}>{time}</span>
             <span>{sender}:</span>
             <span>{message}</span>
