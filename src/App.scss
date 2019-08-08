@@ -1,4 +1,8 @@
 main {
     position: relative;
-    padding: 1.5rem;
+    padding: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
 }

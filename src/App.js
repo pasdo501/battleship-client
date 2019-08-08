@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import Home from "./components/Home";
 import Prep from "./components/Prep";
 import Game from "./components/Game";
+import ChatBox from "./components/ChatBox";
 
 import useSocket from "./hooks/useSocket";
 
@@ -14,7 +15,7 @@ import "./App.scss";
 function App() {
   const [socket, player, connect, disconnect, opponentName] = useSocket();
 
-  const contextValue = React.useMemo(
+  const socketContextValue = React.useMemo(
     () => ({
       socket,
       player,
@@ -27,7 +28,7 @@ function App() {
 
   return (
     <Router>
-      <SocketContext.Provider value={contextValue}>
+      <SocketContext.Provider value={socketContextValue}>
         <Header />
         <main>
           <Switch>
@@ -36,6 +37,7 @@ function App() {
             <Route path="/game" component={Game} />
             <Route render={() => <div>404</div>} />
           </Switch>
+          <Route path={["/prep", "/game"]} component={ChatBox} />
         </main>
       </SocketContext.Provider>
     </Router>

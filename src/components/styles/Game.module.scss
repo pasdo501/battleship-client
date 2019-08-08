@@ -1,4 +1,6 @@
 .table {
+    max-width: 1000px;
+    flex: 1 1 auto;
     @media (min-width: 797px) {
         display: flex;
         flex-direction: row;
@@ -8,14 +10,6 @@
 }
 
 .info {
-    break-after: always;
     padding: 1rem 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: center;
-
-    span {
-        break-before: always
-    }
+    break-after: always
 }

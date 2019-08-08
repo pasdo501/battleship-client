@@ -6,7 +6,7 @@ import Loading from "./Loading";
 
 import styles from "./styles/Prep.module.scss";
 
-import FlashState from "../util/FlashState"
+import FlashState from "../util/FlashState";
 import { FREE_CELL } from "../util/variables";
 import usePlacement from "../hooks/usePlacement";
 import SocketContex from "../contexts/socket";
@@ -260,7 +260,7 @@ export default function Prep() {
 
   const { board, placeable } = state;
 
-  if (FlashState.get('redirectHome')) {
+  if (FlashState.get("redirectHome")) {
     return <Redirect to="/" />;
   }
 
@@ -269,7 +269,7 @@ export default function Prep() {
   }
 
   return (
-    <React.Fragment>
+    <section className={styles.prepSection}>
       {waiting && <Loading text={`Waiting for ${opponentName} `} speed={400} />}
       <h2 style={{ textAlign: `center` }}>Prepare your Ships!</h2>
 
@@ -334,10 +334,12 @@ export default function Prep() {
               ))}
             </tbody>
           </table>
-          <button onClick={toggleOrientation}>Toggle Rotation (T)</button>
+          <button className={styles.button} onClick={toggleOrientation}>
+            Toggle Rotation (T)
+          </button>
           {shipsLeft > 0 || (
             <button
-              style={{ display: `block` }}
+              className={styles.button}
               onClick={() => {
                 if (socket !== null) {
                   socket.emit("initialise_board", board);
@@ -350,6 +352,6 @@ export default function Prep() {
           )}
         </div>
       </div>
-    </React.Fragment>
+    </section>
   );
 }
