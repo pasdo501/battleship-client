@@ -89,15 +89,15 @@ function prepReducer(state, action) {
       };
       let head = null;
       for (let [row, column] of getCoords(origin)) {
-        newBoard[row][column] = {
-          ...newBoard[row][column],
-          type: state.shipType,
-          head: head === null ? [row, column] : head,
-          orientation: origin.orientation,
-        };
         if (head === null) {
           head = [row, column];
         }
+        newBoard[row][column] = {
+          ...newBoard[row][column],
+          type: state.shipType,
+          head,
+          orientation: origin.orientation,
+        };
       }
 
       const newQuantity = state.shipType.quantity - 1;
@@ -113,7 +113,7 @@ function prepReducer(state, action) {
             ? null
             : {
                 ...state.shipType,
-                quantity: state.shipType.quantity - 1,
+                quantity: newQuantity,
               },
       };
     }

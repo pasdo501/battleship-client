@@ -16,37 +16,36 @@ export default function PrepBoard({
   return (
     <div className={styles.grid} onMouseLeave={handleMouseLeave}>
       <InfoColumn />
-      {board.map((row, index) => (
-        <React.Fragment key={`row-${index}`}>
-          {row.map((column, cIndex) => {
-            let color;
-            if (column.hover) {
-              color = placeable ? "green" : "red";
-            } else {
-              color = column.type ? column.type.color : column.color;
-            }
-            return (
-              <React.Fragment key={`cell-${index}-${cIndex}`}>
-                {cIndex === 0 ? (
-                  <div className={styles.cell}>
-                    <span>{index + 1}</span>
-                  </div>
-                ) : null}
-                <div
-                  className={styles.interactiveCell}
-                  style={{ backgroundColor: color }}
-                  onMouseEnter={() => handleMouseEnter(index, cIndex)}
-                  onClick={
-                    column.type
-                      ? () => handlePickupShip(column)
-                      : () => handlePlacement(index, cIndex)
-                  }
-                />
-              </React.Fragment>
-            );
-          })}
-        </React.Fragment>
-      ))}
+      {board.map((row, index) =>
+        row.map((column, cIndex) => {
+          let color;
+          if (column.hover) {
+            color = placeable ? "green" : "red";
+          } else {
+            color = column.type ? column.type.color : column.color;
+          }
+          return (
+            <React.Fragment key={`cell-${index}-${cIndex}`}>
+              {/* First column = 'info' column (1 - 10) */}
+              {cIndex === 0 ? (
+                <div className={styles.cell}>
+                  <span>{index + 1}</span>
+                </div>
+              ) : null}
+              <div
+                className={styles.interactiveCell}
+                style={{ backgroundColor: color }}
+                onMouseEnter={() => handleMouseEnter(index, cIndex)}
+                onClick={
+                  column.type
+                    ? () => handlePickupShip(column)
+                    : () => handlePlacement(index, cIndex)
+                }
+              />
+            </React.Fragment>
+          );
+        })
+      )}
     </div>
   );
 }
