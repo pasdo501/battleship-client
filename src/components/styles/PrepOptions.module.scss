@@ -1,0 +1,54 @@
+.row {
+  display: grid;
+  grid-template-columns: 50% max-content;
+  align-items: center;
+  cursor: pointer;
+  & > div:first-child {
+    padding: 0.45rem 0;
+  }
+  &:hover > * {
+    background-color: whitesmoke;
+  }
+}
+
+.typeVisualisation {
+  display: flex;
+  padding: 0.5rem 0;
+
+  div {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid black;
+  }
+}
+
+.buttonWrapper {
+  display: grid;
+  grid-template-columns: 25% max-content;
+  grid-row-gap: 1rem;
+  margin-top: 1rem;
+}
+
+.button {
+  grid-column: span 2;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 1px solid black;
+  cursor: pointer;
+  color: black;
+  background-color: white;
+  transition: all 0.25s ease;
+
+  &:hover:enabled {
+    color: white;
+    background-color: black;
+    border: 1px solid white;
+  }
+
+  &:disabled {
+    color: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+  }
+}

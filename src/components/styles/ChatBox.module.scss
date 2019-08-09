@@ -1,46 +1,48 @@
 .wrapper {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 80% 20%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 25vh 20%;
+  height: calc(25vh + 20%);
 
-    @media (min-width: 501px) and (max-width: 850px) {
-        grid-column: span 2;
-    }
+  @media (min-width: 501px) and (max-width: 850px) {
+    grid-column: span 2;
+  }
 
-    @media (max-width: 500px) {
-        grid-column: auto;
-    }
+  @media (max-width: 500px) {
+    grid-column: auto;
+  }
 }
 
 .chatBox {
-    overflow-y: auto;
-    display: grid;
-    grid-auto-rows: min-content;
-    padding: .3rem;
-    border: 1px solid #ccc;
-    border-bottom: none;
+  overflow-y: auto;
+  display: grid;
+  grid-auto-rows: min-content;
+  padding: 0.3rem;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  max-height: 25vh;
 
-    div {
-        display: grid;
-        grid-template-columns: auto auto 3fr;
-        grid-column-gap: .5rem;
-    }
+  div {
+    display: grid;
+    grid-template-columns: auto auto 3fr;
+    grid-column-gap: 0.5rem;
+  }
 }
 
 .systemMessage {
-    color: red;
-    font-weight: bold;
+  color: red;
+  font-weight: bold;
 }
 
 .otherMessage {
-    color: navy;
-    font-weight: bold;
+  color: navy;
+  font-weight: bold;
 }
 
 .time {
-    font-weight: lighter;
+  font-weight: lighter;
 }
 
 .textInput {
-    border: 1px solid #ccc;
+  border: 1px solid #ccc;
 }

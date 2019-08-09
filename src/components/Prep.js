@@ -1,10 +1,11 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
 
-import InfoRow from "./InfoRow";
+import PrepBoard from "./PrepBoard";
+import PrepOptions from "./PrepOptions";
 import Loading from "./Loading";
 
-import styles from "./styles/Prep.module.scss";
+import styles from "./styles/shared.module.scss";
 
 import FlashState from "../util/FlashState";
 import { FREE_CELL } from "../util/variables";
@@ -258,6 +259,13 @@ export default function Prep() {
     return () => document.removeEventListener("keydown", listener);
   });
 
+  const handleReady = () => {
+    if (socket === null) return;
+
+    socket.emit("initialise_board", board);
+    setWaiting(true);
+  };
+
   const { board, placeable } = state;
 
   if (FlashState.get("redirectHome")) {
@@ -269,89 +277,26 @@ export default function Prep() {
   }
 
   return (
-    <section className={styles.prepSection}>
+    <React.Fragment>
       {waiting && <Loading text={`Waiting for ${opponentName} `} speed={400} />}
-      <h2 style={{ textAlign: `center` }}>Prepare your Ships!</h2>
+      <h2 className={styles.header}>Prepare your Ships!</h2>
 
-      <div className={styles.wrapper}>
-        <div className={styles.board} onMouseLeave={resetOriginCoords}>
-          <InfoRow />
-          {board.map((row, index) => (
-            <div key={`row-${index}`} className={styles.row}>
-              <div className={styles.infoColumn}>{index + 1}</div>
-              {row.map((column, cIndex) => {
-                let color;
-                if (column.hover) {
-                  color = placeable ? "green" : "red";
-                } else {
-                  color = column.type ? column.type.color : column.color;
-                }
-                return (
-                  <div
-                    style={{ backgroundColor: color }}
-                    key={`column-${index}-${cIndex}`}
-                    className={styles.interactiveColumn}
-                    onMouseEnter={() => onMouseEnter(index, cIndex)}
-                    onClick={
-                      column.type
-                        ? () => pickupShip(column)
-                        : () => handlePlacement(index, cIndex)
-                    }
-                  />
-                );
-              })}
-            </div>
-          ))}
-        </div>
-        <div className={styles.options}>
-          <table className={styles.table}>
-            <tbody>
-              {placementObjects.map((type) => (
-                <tr key={type.name} onClick={() => handleTypeChange(type)}>
-                  <td
-                    style={
-                      state.shipType &&
-                      state.shipType.type === type.type &&
-                      state.shipType.quantity > 0
-                        ? { fontWeight: `bold` }
-                        : {}
-                    }
-                  >
-                    {type.name} x {type.quantity}
-                  </td>
-                  <td className={styles.typeVisualisation}>
-                    {/* TODO: Make this less gross */}
-                    {Array(type.size)
-                      .fill(0)
-                      .map((_, index) => (
-                        <div
-                          key={index}
-                          style={{ backgroundColor: type.color }}
-                        />
-                      ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button className={styles.button} onClick={toggleOrientation}>
-            Toggle Rotation (T)
-          </button>
-          {shipsLeft > 0 || (
-            <button
-              className={styles.button}
-              onClick={() => {
-                if (socket !== null) {
-                  socket.emit("initialise_board", board);
-                }
-                setWaiting(true);
-              }}
-            >
-              Ready!
-            </button>
-          )}
-        </div>
-      </div>
-    </section>
+      <PrepBoard
+        board={board}
+        placeable={placeable}
+        handleMouseEnter={onMouseEnter}
+        handleMouseLeave={resetOriginCoords}
+        handlePlacement={handlePlacement}
+        handlePickupShip={pickupShip}
+      />
+      <PrepOptions
+        placementObjects={placementObjects}
+        handleTypeChange={handleTypeChange}
+        toggleOrientation={toggleOrientation}
+        shipsLeft={shipsLeft}
+        handleReady={handleReady}
+        shipType={state.shipType}
+      />
+    </React.Fragment>
   );
 }

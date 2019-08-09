@@ -5,11 +5,11 @@ import PropTypes from "prop-types";
 import { wrapper } from "./styles/Loading.module.scss";
 
 export default function Loading({ text = "Loading", speed = 300, ...attrs }) {
-  const [dots, setDots] = React.useState('');
+  const [dots, setDots] = React.useState("");
 
   React.useEffect(() => {
     const intervalId = window.setInterval(() => {
-      setDots((dots) => dots === '...' ? '' : `${dots}.`)
+      setDots((dots) => (dots === "..." ? "" : `${dots}.`));
     }, speed);
 
     return () => window.clearInterval(intervalId);
@@ -17,7 +17,10 @@ export default function Loading({ text = "Loading", speed = 300, ...attrs }) {
 
   return (
     <div className={wrapper} {...attrs}>
-      <h2>{text}{dots}</h2>
+      <h2>
+        {text}
+        {dots}
+      </h2>
     </div>
   );
 }

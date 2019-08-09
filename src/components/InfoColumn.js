@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import styles from "./styles/GridTest.module.scss";
+import styles from "./styles/Board.module.scss";
 
 export default function InfoRow({ length = 10 }) {
   const cells = [];

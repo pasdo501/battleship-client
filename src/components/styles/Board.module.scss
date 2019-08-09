@@ -4,16 +4,16 @@
   grid-auto-rows: 1fr;
 
   &:before {
-      content: '';
-      width: 0;
-      padding-bottom: 100%;
-      grid-row: 1 / 1;
-      grid-column: 1 / 1;
+    content: "";
+    width: 0;
+    padding-bottom: 100%;
+    grid-row: 1 / 1;
+    grid-column: 1 / 1;
   }
 
   & > *:first-child {
-      grid-row: 1 / 1;
-      grid-column: 1 / 1;
+    grid-row: 1 / 1;
+    grid-column: 1 / 1;
   }
 }
 
@@ -30,14 +30,21 @@
   @extend .cell;
   cursor: pointer;
   &:hover {
-      background-color: whitesmoke;
+    background-color: whitesmoke;
   }
 }
 
+.cellContent {
+  cursor: default;
+  font-size: 1.3rem;
+}
+
 .hit {
+  @extend .cellContent;
   color: black;
 }
 
 .miss {
+  @extend .cellContent;
   color: crimson;
 }
