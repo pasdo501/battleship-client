@@ -1,12 +1,13 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
-import styles from "./styles/Game.module.scss";
+import styles from "./styles/shared.module.scss";
 
 import Board from "./Board";
 import Modal from "./Modal";
 
 import SocketContext from "../contexts/socket";
 
+import FlashState from "../util/FlashState";
 import { CELL_HIT, CELL_MISS } from "../util/variables";
 
 function gameReducer(state, action) {
@@ -75,13 +76,13 @@ export default function Game({ location }) {
     socket.emit("gameReady");
 
     return () => {
-      socket.off("hitResult");
-      socket.off("receiveShot");
       socket.off("startGame");
+      socket.off("shotResult");
+      socket.off("receiveShot");
     };
   }, [socket]);
 
-  if (socket === null) {
+  if (FlashState.get("redirectHome") || socket === null) {
     return <Redirect to="/" />;
   }
 
@@ -100,23 +101,21 @@ export default function Game({ location }) {
 
   return (
     <React.Fragment>
-    <h2 className={styles.info}>
+      {victory !== null ? (
+        <Modal withCloseButton={false}>
+          <h2>{victory === true ? "You win!" : "You lose :("}</h2>
+        </Modal>
+      ) : null}
+      <h2 className={styles.header}>
         {turn ? (
           <span>It's your turn ...</span>
         ) : (
           <span>It's {opponentName}'s turn ...</span>
         )}
       </h2>
-    <section className={styles.table}>
-      {victory !== null ? (
-        <Modal withCloseButton={false}>
-          <h2>{victory === true ? "You win!" : "You lose :("}</h2>
-        </Modal>
-      ) : null}
-      
+
       <Board board={playerBoard} interactive={false} />
       <Board board={opponentBoard} interactive={true} shoot={shoot} />
-    </section>
     </React.Fragment>
   );
 }

@@ -1,8 +1,21 @@
 main {
-    position: relative;
-    padding: 2rem;
-    display: flex;
-    flex-wrap: wrap;
+  position: relative;
+  display: grid;
+  grid-template-columns: 32% 32% 26%;
+  grid-column-gap: 2rem;
+  width: 100%;
+  justify-content: center;
+
+  @media (min-width: 501px) and (max-width: 850px) {
+    grid-template-columns: 45% 45%;
+    grid-template-rows: auto auto 25vh;
+    grid-row-gap: 1rem;
+  }
+
+  @media (max-width: 500px) {
+    grid-template-columns: 80%;
+    grid-template-rows: auto auto auto 25vh;
+    grid-row-gap: 1rem;
     justify-content: center;
-    align-content: center;
+  }
 }

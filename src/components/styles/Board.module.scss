@@ -1,74 +1,50 @@
-.board {
-  flex: 1 1 auto;
-  max-width: 45%;
-  @media (max-width: 796px) {
-    max-width: 80%;
-    margin: 1.5rem auto;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(1rem, 1fr));
+  grid-auto-rows: 1fr;
+
+  &:before {
+    content: "";
+    width: 0;
+    padding-bottom: 100%;
+    grid-row: 1 / 1;
+    grid-column: 1 / 1;
+  }
+
+  & > *:first-child {
+    grid-row: 1 / 1;
+    grid-column: 1 / 1;
   }
 }
 
-.row {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  flex: 0 0 auto;
-}
-
-.column {
-  position: relative;
-  background-color: white;
+.cell {
   border: 1px solid black;
-  width: 10%;
-  padding-top: 10%;
+  background-color: white;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.interactiveColumn {
-  @extend .column;
+.interactiveCell {
+  @extend .cell;
   cursor: pointer;
   &:hover {
     background-color: whitesmoke;
   }
 }
 
-.placementOverlay {
-    background-color: black;
-    &:hover {
-        background-color: black;
-    }
-}
-
-.infoColumn {
-  display: flex;
-  justify-items: center;
-  align-items: center;
-  padding-right: 0.8rem;
-  max-width: 0.4rem;
-  border: 0.1rem solid black;
-}
-
-/** Style that will be useful for when cells are marked as
-    hit or miss
-    Note: Column will need pos: relative for this to work
-*/
-.targetedColumn {
-  position: absolute;
-  width: 2rem;
-  height: 2rem;
-  font-size: 2rem;
-  font-weight: lighter;
-  top: calc(50% - 1rem);
-  left: calc(50% - 1rem);
-  padding: 0;
-  margin: 0;
-  text-align: center;
+.cellContent {
   cursor: default;
+  font-size: 1.3rem;
 }
 
 .hit {
-  @extend .targetedColumn;
+  @extend .cellContent;
   color: black;
 }
+
 .miss {
-  @extend .targetedColumn;
+  @extend .cellContent;
   color: crimson;
 }

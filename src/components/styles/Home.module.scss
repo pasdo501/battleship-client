@@ -1,5 +1,5 @@
 .wrapper {
-  flex: 1 1 auto;
+  grid-column: span 3;
 }
 
 .bigButton {
@@ -13,8 +13,10 @@
   max-width: 20rem;
   color: white;
   background-color: black;
-  transition: all .25s ease;
-  &:hover, &:active, &:focus {
+  transition: all 0.25s ease;
+  &:hover,
+  &:active,
+  &:focus {
     color: black;
     background-color: white;
   }
