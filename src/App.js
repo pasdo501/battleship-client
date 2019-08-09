@@ -7,7 +7,6 @@ import Home from "./components/Home";
 import Prep from "./components/Prep";
 import Game from "./components/Game";
 import ChatBox from "./components/ChatBox";
-import GridTest from "./components/GridTest";
 
 import useSocket from "./hooks/useSocket";
 
@@ -36,7 +35,6 @@ function App() {
             <Route exact path="/" component={Home} />
             <Route path="/prep" component={Prep} />
             <Route path="/game" component={Game} />
-            <Route path="/test" component={GridTest} />
             <Route render={() => <div>404</div>} />
           </Switch>
           <Route path={["/prep", "/game"]} component={ChatBox} />
