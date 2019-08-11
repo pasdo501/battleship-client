@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import styles from "./styles/Board.module.scss";
 
-export default function InfoRow({ length = 10 }) {
+export default function InfoColumn({ length = 10 }) {
   const cells = [];
   for (let i = 0; i <= length; i++) {
     cells.push(i === 0 ? "" : String.fromCharCode(64 + i));
@@ -20,6 +20,6 @@ export default function InfoRow({ length = 10 }) {
   );
 }
 
-InfoRow.propTypes = {
+InfoColumn.propTypes = {
   length: PropTypes.number,
 };

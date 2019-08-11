@@ -18,8 +18,7 @@ export default function Loading({ text = "Loading", speed = 300, ...attrs }) {
   return (
     <div className={wrapper} {...attrs}>
       <h2>
-        {text}
-        {dots}
+        {text} {dots}
       </h2>
     </div>
   );

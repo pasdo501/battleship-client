@@ -24,10 +24,12 @@ export default function ChatBox() {
     });
   }, [socket]);
 
+  // Scroll to the bottom of the chat box when new chat is received
   React.useEffect(() => {
     chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
   }, [chat, chatBoxRef]);
 
+  /** Allow submitting chat with the 'enter' key */
   const handleKeyPress = (e) => {
     if (e.keyCode === 13) {
       e.preventDefault();

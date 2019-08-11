@@ -15,6 +15,7 @@ export default function PrepBoard({
 }) {
   return (
     <div className={styles.grid} onMouseLeave={handleMouseLeave}>
+      {/* Info Column refers to the first column displaying  A - J */}
       <InfoColumn />
       {board.map((row, index) =>
         row.map((column, cIndex) => {
@@ -22,6 +23,8 @@ export default function PrepBoard({
           if (column.hover) {
             color = placeable ? "green" : "red";
           } else {
+            // If type is set, something is sitting in this cell, with a color
+            // property
             color = column.type ? column.type.color : column.color;
           }
           return (
@@ -37,6 +40,8 @@ export default function PrepBoard({
                 style={{ backgroundColor: color }}
                 onMouseEnter={() => handleMouseEnter(index, cIndex)}
                 onClick={
+                  // If something is already in this cell, clicking will 
+                  // pick it up, otherwise put down what's currently selected
                   column.type
                     ? () => handlePickupShip(column)
                     : () => handlePlacement(index, cIndex)
