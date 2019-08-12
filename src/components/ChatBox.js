@@ -32,7 +32,7 @@ export default function ChatBox() {
   }, [socket]);
 
   // Scroll to the bottom of the chat box when new chat is received
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
   }, [chat, chatBoxRef]);
 
