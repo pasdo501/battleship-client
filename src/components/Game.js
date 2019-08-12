@@ -3,7 +3,7 @@ import { Redirect } from "react-router-dom";
 import styles from "./styles/shared.module.scss";
 
 import Board from "./Board";
-import Modal from "./Modal";
+import GameOver from "./GameOver";
 
 import SocketContext from "../contexts/socket";
 
@@ -99,13 +99,12 @@ export default function Game({ location }) {
     return <Redirect to="/" />;
   }
 
+  if (victory !== null) {
+    return <GameOver victorious={victory} />;
+  }
+
   return (
     <React.Fragment>
-      {victory !== null ? (
-        <Modal withCloseButton={false}>
-          <h2>{victory === true ? "You win!" : "You lose :("}</h2>
-        </Modal>
-      ) : null}
       <h2 className={styles.header}>
         {turn ? (
           <span>It's your turn ...</span>

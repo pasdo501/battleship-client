@@ -1,0 +1,22 @@
+.button {
+  break-before: always;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 1px solid black;
+  cursor: pointer;
+  color: black;
+  background-color: white;
+  transition: all 0.25s ease;
+  &:hover:enabled {
+    color: white;
+    background-color: black;
+    border: 1px solid white;
+  }
+
+  &:disabled {
+    color: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+  }
+}

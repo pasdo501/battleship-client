@@ -357,7 +357,7 @@ export default function Prep() {
 
   return (
     <React.Fragment>
-      {waiting && <Loading text={`Waiting for ${opponentName} `} speed={400} />}
+      {waiting && <Loading text={`Waiting for ${opponentName}`} speed={400} />}
       <h2 className={styles.header}>Prepare your Ships!</h2>
 
       <PrepBoard
