@@ -1,5 +1,8 @@
 {
-  "name": "client",
+  "name": "battleship-client",
+  "description": "Client code for a websocket based Battleship app",
+  "author": "pasdo501 <dominikpaschke@hotmail.com",
+  "license": "MIT",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
