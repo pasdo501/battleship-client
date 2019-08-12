@@ -15,11 +15,18 @@ export default function ChatBox() {
     socket.on("message", ({ sender, timestamp, message }) => {
       setChat((chat) => {
         const parsed = {
-          time: new Date(timestamp).toLocaleTimeString(),
+          time: new Date(timestamp).toLocaleTimeString(
+            undefined,
+            { hour: 'numeric', minute: '2-digit'}
+          ),
           sender,
           message,
         };
-        return [...chat, parsed];
+        const newChat = [...chat, parsed]
+        if (newChat.length > 50) {
+          newChat.shift();
+        }
+        return newChat;
       });
     });
   }, [socket]);
