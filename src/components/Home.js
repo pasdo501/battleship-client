@@ -3,6 +3,7 @@ import { Redirect } from "react-router-dom";
 
 import Loading from "./Loading";
 import Modal from "./Modal";
+import Footer from "./Footer";
 
 import FlashState from "../util/FlashState";
 import SocketContext from "../contexts/socket";
@@ -187,6 +188,7 @@ export default function Home() {
           </Modal>
         )}
       </div>
+      <Footer />
     </React.Fragment>
   );
 }
