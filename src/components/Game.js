@@ -82,7 +82,7 @@ export default function Game({ location }) {
     };
   }, [socket]);
 
-  if (FlashState.get("redirectHome") || socket === null) {
+  if (FlashState.get("redirectHome")) {
     return <Redirect to="/" />;
   }
 

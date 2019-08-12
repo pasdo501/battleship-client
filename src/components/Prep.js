@@ -226,6 +226,8 @@ export default function Prep() {
     socket.on("redirect", () => {
       setRedirect(true);
     });
+
+    return () => socket.off("redirect")
   }, [socket]);
 
   /**
