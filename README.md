@@ -8,6 +8,11 @@ _Note:_ If deploying on Surge, after running `yarn build`, make sure to rename t
 
 See [README2](./README2.md) for CRA specific readme.
 
+## Usage
+
+- **Development:** Make sure the server (see below) is running locally, then run yarn start to run the development build at http://localhost:3000.
+- **Production:** Run yarn build to create a production build.
+
 ---
 
 ## Server

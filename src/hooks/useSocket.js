@@ -5,7 +5,7 @@ import FlashState from "../util/FlashState";
 
 const hostAddr =
   process.env.NODE_ENV === "production"
-    ? "http://connect-4-server-connect-4-server.apps.us-east-1.online-starter.openshift.com"
+    ? "http://battleship-server-battleship-server.apps.us-west-2.starter.openshift-online.com/"
     : "localhost:8080";
 
 export default function useSocket() {
