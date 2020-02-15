@@ -5,7 +5,7 @@ import FlashState from "../util/FlashState";
 
 const hostAddr =
   process.env.NODE_ENV === "production"
-    ? "https://node-battleship-server.herokuapp.com:3000"
+    ? "ws://node-battleship-server.herokuapp.com"
     : "localhost:8080";
 
 export default function useSocket() {
